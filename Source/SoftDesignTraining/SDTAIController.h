@@ -8,7 +8,7 @@
 #include "SDTAIController.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(ClassGroup = AI, config = Game)
 class SOFTDESIGNTRAINING_API ASDTAIController : public AAIController
@@ -16,7 +16,7 @@ class SOFTDESIGNTRAINING_API ASDTAIController : public AAIController
     GENERATED_BODY()
 public:
     virtual void Tick(float deltaTime) override;
-    bool MoveTowards(FVector2D direction, float acceleration, float maxSpeed, float deltaTime);
+    bool MoveTowards(FVector direction, float acceleration, float maxSpeed, float deltaTime);
 private:
     float speed = 0;
 };
