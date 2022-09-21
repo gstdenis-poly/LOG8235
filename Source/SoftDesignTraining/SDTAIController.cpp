@@ -3,12 +3,14 @@
 #include "SDTAIController.h"
 #include "SoftDesignTraining.h"
 #include "SoftDesignTrainingCharacter.h"
+#include "SDTUtils.h"
 
 void ASDTAIController::Tick(float deltaTime)
 {
     direction = GetPawn()->GetActorForwardVector();
 
     DetectWall();
+    DetectDeathFloor();
     MoveForward(deltaTime);
 }
 
@@ -39,5 +41,21 @@ void ASDTAIController::DetectWall() {
 }
 
 void ASDTAIController::DetectDeathFloor() {
+    FHitResult outHits;
+    FCollisionObjectQueryParams objectQueryParams;
+    objectQueryParams.AddObjectTypesToQuery(ECC_PhysicsBody);
+    objectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+    objectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+    objectQueryParams.AddObjectTypesToQuery(ECC_GameTraceChannel3);
+    FCollisionQueryParams queryParams = FCollisionQueryParams::DefaultQueryParam;
+    queryParams.bReturnPhysicalMaterial = true;
 
+    FVector forward = direction * OBSTACLE_DETECTION_DISTANCE;
+
+    FVector rayStart = FVector(GetPawn()->GetActorLocation().X + forward.X, GetPawn()->GetActorLocation().Y + forward.Y, 1000);
+    FVector rayEnd = FVector(GetPawn()->GetActorLocation().X + forward.X, GetPawn()->GetActorLocation().Y + forward.Y, 0); 
+
+    bool deathFloorDetected = GetWorld()->LineTraceSingleByObjectType(outHits, rayStart, rayEnd, objectQueryParams, queryParams);
+
+    if (deathFloorDetected && outHits.GetComponent()->GetCollisionObjectType() == COLLISION_DEATH_OBJECT) direction = FVector::CrossProduct(FVector::UpVector, direction);
 }

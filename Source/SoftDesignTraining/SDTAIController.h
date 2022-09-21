@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "SoftDesignTrainingCharacter.h"
+#include "SDTUtils.h"
 #include "SDTAIController.generated.h"
 
 /**
@@ -17,7 +18,7 @@ class SOFTDESIGNTRAINING_API ASDTAIController : public AAIController
 public:
     virtual void Tick(float deltaTime) override;
     bool MoveForward(float deltaTime);
-    void AvoidWallCollision();
+
     void DetectWall();
     void DetectDeathFloor();
 
@@ -28,7 +29,7 @@ public:
         float MAX_SPEED = 1.0;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float OBSTACLE_DETECTION_DISTANCE = 100;
+        float OBSTACLE_DETECTION_DISTANCE = 200;
 
 private:
     float speed = 0;
