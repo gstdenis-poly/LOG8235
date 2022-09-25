@@ -14,7 +14,8 @@ void ASDTAIController::Tick(float deltaTime)
     MoveForward(deltaTime);
 }
 
-bool ASDTAIController::MoveForward(float deltaTime) {
+bool ASDTAIController::MoveForward(float deltaTime) 
+{
     speed += (ACCELERATION * deltaTime);
     if (speed >= MAX_SPEED) speed = MAX_SPEED;
     GetPawn()->AddMovementInput(direction, speed);
@@ -23,7 +24,8 @@ bool ASDTAIController::MoveForward(float deltaTime) {
 
 //Le comportement n'est pas parfait, il doit être peaufiné (peut-être joué avec les valeurs de détection et angle)
 //Le code pourra également être amélioré (lisbilité, clarté, éviter redondance avec les autres fonctions)
-bool ASDTAIController::DetectWall() {
+bool ASDTAIController::DetectWall() 
+{
     FHitResult outHits;
     FCollisionObjectQueryParams objectQueryParams;
     objectQueryParams.AddObjectTypesToQuery(ECC_PhysicsBody);
@@ -35,10 +37,11 @@ bool ASDTAIController::DetectWall() {
     FVector forward = direction * BLOCKING_DETECTION_DISTANCE;
 
     //Detection du mur devant le AI
-    FVector rayEnd = FVector(GetPawn()->GetActorLocation().X + forward.X, GetPawn()->GetActorLocation().Y + forward.Y, GetPawn()->GetActorLocation().Z + forward.Z);
+    FVector rayEnd = GetPawn()->GetActorLocation() + forward;
     bool wallDetected = GetWorld()->LineTraceSingleByObjectType(outHits, GetPawn()->GetActorLocation(), rayEnd, objectQueryParams, queryParams);
 
-    if (wallDetected) {
+    if (wallDetected) 
+    {
         FHitResult rightHit;
         FHitResult leftHit;
         FVector rayStart = GetPawn()->GetActorLocation();
@@ -50,7 +53,8 @@ bool ASDTAIController::DetectWall() {
         bool leftDetected = GetWorld()->LineTraceSingleByObjectType(leftHit, rayStart, rayLeft, objectQueryParams, queryParams);
 
         //Déterminer quel côté le AI devrait tourner pour continuer son chemin sans rencontrer un obstacle
-        if (rightDetected && leftDetected) {
+        if (rightDetected && leftDetected) 
+        {
             if (rightHit.Distance > leftHit.Distance) GetPawn()->AddActorWorldRotation(FRotator(0, rotationAngle, 0), false, (FHitResult*)nullptr, ETeleportType::None);
             else GetPawn()->AddActorWorldRotation(FRotator(0, -rotationAngle, 0), false, (FHitResult*)nullptr, ETeleportType::None);
         }
@@ -64,7 +68,8 @@ bool ASDTAIController::DetectWall() {
     return false;
 }
 
-bool ASDTAIController::DetectDeathFloor() {
+bool ASDTAIController::DetectDeathFloor() 
+{
     FHitResult outHits;
     FCollisionObjectQueryParams objectQueryParams;
     objectQueryParams.AddObjectTypesToQuery(ECC_PhysicsBody);
@@ -82,7 +87,8 @@ bool ASDTAIController::DetectDeathFloor() {
     //Detection du deathfloor devant le AI
     bool deathFloorDetected = GetWorld()->LineTraceSingleByObjectType(outHits, rayStart, rayEnd, objectQueryParams, queryParams);
 
-    if (deathFloorDetected && outHits.GetComponent()->GetCollisionObjectType() == COLLISION_DEATH_OBJECT) {
+    if (deathFloorDetected && outHits.GetComponent()->GetCollisionObjectType() == COLLISION_DEATH_OBJECT) 
+    {
         FHitResult rightHit;
         FHitResult leftHit;
         FVector rayStartRL = GetPawn()->GetActorLocation();
@@ -94,7 +100,8 @@ bool ASDTAIController::DetectDeathFloor() {
         bool leftDetected = GetWorld()->LineTraceSingleByObjectType(leftHit, rayStartRL, rayLeft, objectQueryParams, queryParams);
 
         //Déterminer quel côté le AI devrait tourner pour continuer son chemin sans rencontrer un obstacle
-        if (rightDetected && leftDetected) {
+        if (rightDetected && leftDetected) 
+        {
             if (rightHit.Distance > leftHit.Distance) GetPawn()->AddActorWorldRotation(FRotator(0, rotationAngle, 0), false, (FHitResult*)nullptr, ETeleportType::None);
             else GetPawn()->AddActorWorldRotation(FRotator(0, -rotationAngle, 0), false, (FHitResult*)nullptr, ETeleportType::None);
         }
@@ -108,7 +115,8 @@ bool ASDTAIController::DetectDeathFloor() {
     return false;
 }
 
-bool ASDTAIController::DetectPickup() {
+bool ASDTAIController::DetectPickup() 
+{
     TArray<FHitResult> outHits;
     FCollisionObjectQueryParams objectQueryParams;
     objectQueryParams.AddObjectTypesToQuery(ECC_PhysicsBody);
@@ -125,7 +133,8 @@ bool ASDTAIController::DetectPickup() {
     FVector rayEnd = rayStart + forward;
     bool hitDetected = GetWorld()->SweepMultiByObjectType(outHits, rayStart, rayEnd, GetPawn()->GetActorQuat(), objectQueryParams, FCollisionShape::MakeSphere(OVERLAPPING_DETECTION_DISTANCE), queryParams);
 
-    if (hitDetected) {
+    if (hitDetected) 
+    {
         for (FHitResult outHit : outHits)
         {
             if (outHit.GetComponent()->GetCollisionObjectType() != COLLISION_COLLECTIBLE)
@@ -145,7 +154,8 @@ bool ASDTAIController::DetectPickup() {
     return false;
 }
 
-bool ASDTAIController::DetectPlayer(UWorld* uWorld) {
+bool ASDTAIController::DetectPlayer(UWorld* uWorld) 
+{
     FHitResult outHit;
     FCollisionObjectQueryParams objectQueryParams;
     objectQueryParams.AddObjectTypesToQuery(ECC_GameTraceChannel4);
@@ -154,7 +164,7 @@ bool ASDTAIController::DetectPlayer(UWorld* uWorld) {
 
     FVector forward = direction * BLOCKING_DETECTION_DISTANCE;
     FVector rayStart = GetPawn()->GetActorLocation();
-    FVector rayEnd = FVector(GetPawn()->GetActorLocation().X + forward.X, GetPawn()->GetActorLocation().Y + forward.Y, GetPawn()->GetActorLocation().Z + forward.Z);
+    FVector rayEnd = GetPawn()->GetActorLocation() + forward;
 
     //Détecter si il y a un joueur à proximité de l'AI
     //TODO : revoir l'emplacement et la taille de la sphère pour détecter le joueur
@@ -162,7 +172,8 @@ bool ASDTAIController::DetectPlayer(UWorld* uWorld) {
     bool playerIsPoweredUp = SDTUtils::IsPlayerPoweredUp(uWorld);
 
     //Déterminer quel comportement adopter (fuite ou poursuite)
-    if (playerDetected && outHit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
+    if (playerDetected && outHit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) 
+    {
         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, outHit.GetActor()->GetName());
         if (playerIsPoweredUp) RunAwayFromPlayer(outHit.Location);
         else ChasePlayer(outHit.Location);
@@ -172,12 +183,14 @@ bool ASDTAIController::DetectPlayer(UWorld* uWorld) {
     return false;
 }
 
-void ASDTAIController::ChasePlayer(FVector playerPosition) {
+void ASDTAIController::ChasePlayer(FVector playerPosition) 
+{
     //TODO : ne semble pas bien fonctionner (utiliser une rotation à la place? comme avec detectWall?)
     direction = playerPosition - GetPawn()->GetActorLocation();
 }
 
-void ASDTAIController::RunAwayFromPlayer(FVector playerPosition) {
+void ASDTAIController::RunAwayFromPlayer(FVector playerPosition) 
+{
     //TODO : ne semble pas bien fonctionner (utiliser une rotation à la place? comme avec detectWall?)
     direction = GetPawn()->GetActorLocation() - playerPosition;
 }
