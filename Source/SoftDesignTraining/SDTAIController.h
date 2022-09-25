@@ -18,23 +18,27 @@ class SOFTDESIGNTRAINING_API ASDTAIController : public AAIController
 public:
     virtual void Tick(float deltaTime) override;
     bool MoveForward(float deltaTime);
-    void DetectWall();
-    void DetectDeathFloor();
-    void DetectPlayer(UWorld* uWorld);
+    bool DetectWall();
+    bool DetectDeathFloor();
+    bool DetectPlayer(UWorld* uWorld);
+    bool DetectPickup();
     void ChasePlayer(FVector playerPosition);
     void RunAwayFromPlayer(FVector playerPosition);
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float ACCELERATION = 0.1;
+        float ACCELERATION = 1.0;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
         float MAX_SPEED = 1.0;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float OBSTACLE_DETECTION_DISTANCE = 400;
+        float BLOCKING_DETECTION_DISTANCE = 100;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
+        float OVERLAPPING_DETECTION_DISTANCE = 200;
 
 private:
     float speed = 0;
-    float rotationAngle = 5;
+    float rotationAngle = 15;
     FVector direction = FVector(1, 0, 0);
 };
