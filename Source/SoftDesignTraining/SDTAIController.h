@@ -20,10 +20,8 @@ public:
     bool MoveForward(float deltaTime);
     bool DetectWall();
     bool DetectDeathFloor();
-    bool DetectPlayer(UWorld* uWorld);
+    bool DetectPlayer(bool pickupDetected);
     bool DetectPickup();
-    void ChasePlayer(FVector playerPosition);
-    void RunAwayFromPlayer(FVector playerPosition);
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
         float ACCELERATION = 1.0;
@@ -32,13 +30,9 @@ public:
         float MAX_SPEED = 1.0;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float BLOCKING_DETECTION_DISTANCE = 100;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float OVERLAPPING_DETECTION_DISTANCE = 200;
+        float COLLISION_DETECTION_DISTANCE = 200;
 
 private:
     float speed = 0;
-    float rotationAngle = 15;
     FVector direction = FVector(1, 0, 0);
 };
