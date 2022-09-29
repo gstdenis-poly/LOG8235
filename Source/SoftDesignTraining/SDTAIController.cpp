@@ -16,18 +16,22 @@ void ASDTAIController::Tick(float deltaTime)
 
 bool ASDTAIController::MoveForward(float deltaTime) 
 {
-    //speed += (ACCELERATION * deltaTime);
-    //if (speed >= MAX_SPEED) speed = MAX_SPEED;
+
 
     APawn* pawn = GetPawn();
-    FRotator rotation = direction.ToOrientationRotator() - pawn->GetActorForwardVector().ToOrientationRotator();
 
+    // We change the player rotation according to its current rotation and its direction.
+    FRotator rotation = direction.ToOrientationRotator() - pawn->GetActorForwardVector().ToOrientationRotator();
     pawn->AddActorWorldRotation(rotation, false, (FHitResult*)nullptr, ETeleportType::None);
     
+    // We update the MaxAcceleration and MaxWalkSpeed of the characherMovementComponent.
+    // If those parameters were not modifiable we could ddo this only once.
     GetCharacter()->GetCharacterMovement()->MaxAcceleration = ACCELERATION;
     GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED;
+
+
     pawn->AddMovementInput(direction, 1);
-    //pawn->SetActorLocation(pawn->GetActorLocation() + (speed * direction));
+
     return false;
 }
 
@@ -49,6 +53,7 @@ bool ASDTAIController::DetectWall()
     bool wallDetected = GetWorld()->LineTraceSingleByObjectType(outHits, rayStart, rayEnd, objectQueryParams, queryParams);
     if (wallDetected) 
     {
+
         direction = FVector::CrossProduct(FVector::UpVector, outHits.Normal);
         float directionX = abs(direction.X) == 1 && rand() % 2 == 1 ? direction.X * -1 : direction.X; // Randomly reverse direction on X axis
         float directionY = abs(direction.Y) == 1 && rand() % 2 == 1 ? direction.Y * -1 : direction.Y; // Randomly reverse direction on Y axis
