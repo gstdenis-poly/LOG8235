@@ -20,14 +20,14 @@ public:
     bool MoveForward(float deltaTime);
     bool DetectWall();
     bool DetectDeathFloor();
-    bool DetectPlayer(bool pickupDetected);
+    bool DetectPlayer();
     bool DetectPickup();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float ACCELERATION = 1.0;
+        float ACCELERATION = 0.2;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float MAX_SPEED = 1.0;
+        float MAX_SPEED = 0.6;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
         float COLLISION_DETECTION_DISTANCE = 200;
