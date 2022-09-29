@@ -16,13 +16,32 @@ class SOFTDESIGNTRAINING_API ASDTAIController : public AAIController
 {
     GENERATED_BODY()
 public:
+    // main loop called every tick
     virtual void Tick(float deltaTime) override;
-    bool MoveForward(float deltaTime);
+    /// <summary>
+    /// move the character towards the current direction
+    /// </summary>
+    void MoveForward();
+    /// <summary>
+    /// Detect a possible collision with wall, change the character direction to avoid it.
+    /// </summary>
+    /// <returns>True if a wall is detected</returns>
     bool DetectWall();
+    /// <summary>
+    /// Detect a possible collision with death floor, change the character direction to avoid it.
+    /// </summary>
+    /// <returns>True if a death floor is detected</returns>
     bool DetectDeathFloor();
+    /// <summary>
+    /// Detect if the player is near, run from if powerer up, towards him if not.
+    /// </summary>
+    /// <returns>True if player is near</returns>
     bool DetectPlayer(bool pickupDetected);
+    /// <summary>
+    /// Detect if the pickup is near run towards it.
+    /// </summary>
+    /// <returns>True if pickup is near</returns>
     bool DetectPickup();
-
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (ClampMin = 1, ClampMax = 250))
         // Acceleration of the AI character, by default 1m.s^-2, can be set between 1 and 10
