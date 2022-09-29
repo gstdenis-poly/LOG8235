@@ -10,20 +10,23 @@ void ASDTAIController::Tick(float deltaTime)
     bool obstacleDetected = DetectWall();
     obstacleDetected = obstacleDetected || DetectDeathFloor();
     bool pickupDetected = !obstacleDetected && DetectPickup();
-    bool playerDetected = !obstacleDetected && DetectPlayer();
+    bool playerDetected = !obstacleDetected && DetectPlayer(pickupDetected);
     MoveForward(deltaTime);
 }
 
 bool ASDTAIController::MoveForward(float deltaTime) 
 {
-    speed += (ACCELERATION * deltaTime);
-    if (speed >= MAX_SPEED) speed = MAX_SPEED;
+    //speed += (ACCELERATION * deltaTime);
+    //if (speed >= MAX_SPEED) speed = MAX_SPEED;
 
     APawn* pawn = GetPawn();
     FRotator rotation = direction.ToOrientationRotator() - pawn->GetActorForwardVector().ToOrientationRotator();
 
     pawn->AddActorWorldRotation(rotation, false, (FHitResult*)nullptr, ETeleportType::None);
-    pawn->AddMovementInput(direction*speed, 1);
+    
+    GetCharacter()->GetCharacterMovement()->MaxAcceleration = ACCELERATION;
+    GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED;
+    pawn->AddMovementInput(direction, 1);
     //pawn->SetActorLocation(pawn->GetActorLocation() + (speed * direction));
     return false;
 }
@@ -50,7 +53,6 @@ bool ASDTAIController::DetectWall()
         float directionX = abs(direction.X) == 1 && rand() % 2 == 1 ? direction.X * -1 : direction.X; // Randomly reverse direction on X axis
         float directionY = abs(direction.Y) == 1 && rand() % 2 == 1 ? direction.Y * -1 : direction.Y; // Randomly reverse direction on Y axis
         direction = FVector(directionX, directionY, 0);
-        speed = speed - 0.2f;
         return true;
     }
     return false;
@@ -79,7 +81,6 @@ bool ASDTAIController::DetectDeathFloor()
         float directionX = abs(direction.X) == 1 && rand() % 2 == 1 ? direction.X * -1 : direction.X; // Randomly reverse direction on X axis
         float directionY = abs(direction.Y) == 1 && rand() % 2 == 1 ? direction.Y * -1 : direction.Y; // Randomly reverse direction on Y axis
         direction = FVector(directionX, directionY, 0);
-        speed = speed - 0.2f;
         return true;
     }
     return false;
@@ -118,7 +119,7 @@ bool ASDTAIController::DetectPickup()
     return false;
 }
 
-bool ASDTAIController::DetectPlayer() 
+bool ASDTAIController::DetectPlayer(bool pickupDetected) 
 {
     TArray<FHitResult> outHits;
     FCollisionObjectQueryParams objectQueryParams;
@@ -144,7 +145,7 @@ bool ASDTAIController::DetectPlayer()
                 continue;
 
             FVector playerDirection = outHit.GetActor()->GetActorLocation() - pawn->GetActorLocation();
-            direction = SDTUtils::IsPlayerPoweredUp(GetWorld()) ? direction * playerDirection * -1 : playerDirection;
+            direction = pickupDetected ? direction * playerDirection * -1 : playerDirection;
             direction = FVector(direction.X, direction.Y, 0);
             return true;
         }
