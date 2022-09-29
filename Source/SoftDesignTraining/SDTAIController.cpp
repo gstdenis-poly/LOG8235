@@ -23,7 +23,8 @@ bool ASDTAIController::MoveForward(float deltaTime)
     FRotator rotation = direction.ToOrientationRotator() - pawn->GetActorForwardVector().ToOrientationRotator();
 
     pawn->AddActorWorldRotation(rotation, false, (FHitResult*)nullptr, ETeleportType::None);
-    pawn->AddMovementInput(direction, speed);
+    pawn->AddMovementInput(direction*speed, 1);
+    //pawn->SetActorLocation(pawn->GetActorLocation() + (speed * direction));
     return false;
 }
 

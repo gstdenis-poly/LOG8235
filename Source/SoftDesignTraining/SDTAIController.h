@@ -23,16 +23,22 @@ public:
     bool DetectPlayer(bool pickupDetected);
     bool DetectPickup();
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float ACCELERATION = 1.0;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (ClampMin = 1, ClampMax = 10))
+        // Acceleration of the AI character, by default 1m.s^-2, can be set between 1 and 10
+        float ACCELERATION = 2.5;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float MAX_SPEED = 1.0;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (ClampMin = 1, ClampMax = 10))
+        // Max speed of the AI character, by default 1m.s^-1, can be set between 1 and 10
+        float MAX_SPEED = 150.0;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (ClampMin = 10, ClampMax = 1000))
+        // Distance at which the AI character detects a collision, by default 200cm, can be set between 10 and 1000
         float COLLISION_DETECTION_DISTANCE = 200;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
+        float speed = 0;
 private:
-    float speed = 0;
+
     FVector direction = FVector(1, 0, 0);
 };
