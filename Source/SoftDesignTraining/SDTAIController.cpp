@@ -10,7 +10,7 @@ void ASDTAIController::Tick(float deltaTime)
     bool obstacleDetected = DetectWall();
     obstacleDetected = obstacleDetected || DetectDeathFloor();
     bool pickupDetected = !obstacleDetected && DetectPickup();
-    bool playerDetected = !obstacleDetected && DetectPlayer(pickupDetected);
+    bool playerDetected = !obstacleDetected && DetectPlayer();
     MoveForward(deltaTime);
 }
 
@@ -50,6 +50,7 @@ bool ASDTAIController::DetectWall()
         float directionX = abs(direction.X) == 1 && rand() % 2 == 1 ? direction.X * -1 : direction.X; // Randomly reverse direction on X axis
         float directionY = abs(direction.Y) == 1 && rand() % 2 == 1 ? direction.Y * -1 : direction.Y; // Randomly reverse direction on Y axis
         direction = FVector(directionX, directionY, 0);
+        speed = speed - 0.2f;
         return true;
     }
     return false;
@@ -78,6 +79,7 @@ bool ASDTAIController::DetectDeathFloor()
         float directionX = abs(direction.X) == 1 && rand() % 2 == 1 ? direction.X * -1 : direction.X; // Randomly reverse direction on X axis
         float directionY = abs(direction.Y) == 1 && rand() % 2 == 1 ? direction.Y * -1 : direction.Y; // Randomly reverse direction on Y axis
         direction = FVector(directionX, directionY, 0);
+        speed = speed - 0.2f;
         return true;
     }
     return false;
@@ -116,7 +118,7 @@ bool ASDTAIController::DetectPickup()
     return false;
 }
 
-bool ASDTAIController::DetectPlayer(bool pickupDetected) 
+bool ASDTAIController::DetectPlayer() 
 {
     TArray<FHitResult> outHits;
     FCollisionObjectQueryParams objectQueryParams;
@@ -142,7 +144,7 @@ bool ASDTAIController::DetectPlayer(bool pickupDetected)
                 continue;
 
             FVector playerDirection = outHit.GetActor()->GetActorLocation() - pawn->GetActorLocation();
-            direction = pickupDetected ? direction * playerDirection * -1 : playerDirection;
+            direction = SDTUtils::IsPlayerPoweredUp(GetWorld()) ? direction * playerDirection * -1 : playerDirection;
             direction = FVector(direction.X, direction.Y, 0);
             return true;
         }

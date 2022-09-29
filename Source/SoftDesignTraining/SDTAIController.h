@@ -20,7 +20,7 @@ public:
     bool MoveForward(float deltaTime);
     bool DetectWall();
     bool DetectDeathFloor();
-    bool DetectPlayer(bool pickupDetected);
+    bool DetectPlayer();
     bool DetectPickup();
 
     
