@@ -10,7 +10,7 @@ void ASDTAIController::Tick(float deltaTime)
     bool obstacleDetected = DetectWall();
     obstacleDetected = obstacleDetected || DetectDeathFloor();
     bool pickupDetected = !obstacleDetected && DetectPickup();
-    bool playerDetected = !obstacleDetected && DetectPlayer(pickupDetected);
+    bool playerDetected = !obstacleDetected && DetectPlayer(SDTUtils::IsPlayerPoweredUp(GetWorld()));
     MoveForward(deltaTime);
 }
 
@@ -150,7 +150,7 @@ bool ASDTAIController::DetectPlayer(bool pickupDetected)
                 continue;
 
             FVector playerDirection = outHit.GetActor()->GetActorLocation() - pawn->GetActorLocation();
-            direction = pickupDetected ? direction * playerDirection * -1 : playerDirection;
+            direction = pickupDetected ? -playerDirection : playerDirection;
             direction = FVector(direction.X, direction.Y, 0);
             return true;
         }

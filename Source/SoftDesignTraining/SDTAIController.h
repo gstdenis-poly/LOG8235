@@ -26,18 +26,18 @@ public:
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (ClampMin = 1, ClampMax = 250))
         // Acceleration of the AI character, by default 1m.s^-2, can be set between 1 and 10
-        float ACCELERATION = 200;
+        float ACCELERATION = 200.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (ClampMin = 1, ClampMax = 600))
         // Max speed of the AI character, by default 1m.s^-1, can be set between 1 and 10
-        float MAX_SPEED = 500;
+        float MAX_SPEED = 500.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (ClampMin = 100, ClampMax = 1000))
         // Distance at which the AI character detects a collision, by default 200cm, can be set between 10 and 1000
-        float COLLISION_DETECTION_DISTANCE = 200;
+        float COLLISION_DETECTION_DISTANCE = 200.f;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
-        float speed = 0;
+        float speed = 0.f;
 private:
 
     FVector direction = FVector(1, 0, 0);
