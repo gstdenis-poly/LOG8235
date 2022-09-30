@@ -48,11 +48,17 @@ bool ASDTAIController::DetectWall()
     bool wallDetected = GetWorld()->LineTraceSingleByObjectType(outHits, rayStart, rayEnd, objectQueryParams, queryParams);
     if (wallDetected) 
     {
-
-        direction = FVector::CrossProduct(FVector::UpVector, outHits.Normal);
-        float directionX = abs(direction.X) == 1 && rand() % 2 == 1 ? direction.X * -1 : direction.X; // Randomly reverse direction on X axis
-        float directionY = abs(direction.Y) == 1 && rand() % 2 == 1 ? direction.Y * -1 : direction.Y; // Randomly reverse direction on Y axis
+        FVector newdirection = FVector::CrossProduct(FVector::UpVector, outHits.Normal);
+        float directionX = abs(newdirection.X) == 1 && rand() % 2 == 1 ? newdirection.X * -1 : newdirection.X; // Randomly reverse direction on X axis
+        float directionY = abs(newdirection.Y) == 1 && rand() % 2 == 1 ? newdirection.Y * -1 : newdirection.Y; // Randomly reverse direction on Y axis
         direction = FVector(directionX, directionY, 0);
+
+        // TODO : trajectoire arrondie pour éviter le mur
+        // Ceci permet une rotation progressive comme voulue, mais le AI tourne toujours dans le même sens
+        // Donc peut rester pris à certains endroits
+        
+        //direction = FVector(direction.X + newdirection.X, direction.Y + newdirection.Y, 0);
+        //direction.Normalize();
         return true;
     }
     return false;
