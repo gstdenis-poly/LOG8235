@@ -57,6 +57,9 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = AI)
         float speed = 0.f;
+
 private:
+    UPrimitiveComponent* detectedObstacle = nullptr;
+    float rotationSide = 1;
     FVector direction = FVector(1, 0, 0);
 };

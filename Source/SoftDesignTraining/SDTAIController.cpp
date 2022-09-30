@@ -7,6 +7,11 @@
 
 void ASDTAIController::Tick(float deltaTime)
 {
+    // We update the MaxAcceleration and MaxWalkSpeed of the characherMovementComponent.
+    // If those parameters were not modifiable we could do this only once.
+    GetCharacter()->GetCharacterMovement()->MaxAcceleration = ACCELERATION;
+    GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED;
+
     bool obstacleDetected = DetectWall();
     obstacleDetected = obstacleDetected || DetectDeathFloor();
     bool pickupDetected = !obstacleDetected && DetectPickup();
@@ -21,11 +26,6 @@ void ASDTAIController::MoveForward()
     // We change the player rotation according to its current rotation and its direction.
     FRotator rotation = direction.ToOrientationRotator() - pawn->GetActorForwardVector().ToOrientationRotator();
     pawn->AddActorWorldRotation(rotation, false, (FHitResult*)nullptr, ETeleportType::None);
-    
-    // We update the MaxAcceleration and MaxWalkSpeed of the characherMovementComponent.
-    // If those parameters were not modifiable we could ddo this only once.
-    GetCharacter()->GetCharacterMovement()->MaxAcceleration = ACCELERATION;
-    GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED;
 
     pawn->AddMovementInput(direction, 1);
 }
@@ -48,17 +48,15 @@ bool ASDTAIController::DetectWall()
     bool wallDetected = GetWorld()->LineTraceSingleByObjectType(outHits, rayStart, rayEnd, objectQueryParams, queryParams);
     if (wallDetected) 
     {
+        if(detectedObstacle == nullptr) detectedObstacle = outHits.GetComponent();
+        else if (detectedObstacle != outHits.GetComponent()) {
+            detectedObstacle = outHits.GetComponent();
+            rotationSide = rand() % 2 == 1 ? 1 : -1;
+        }
         FVector newdirection = FVector::CrossProduct(FVector::UpVector, outHits.Normal);
-        float directionX = abs(newdirection.X) == 1 && rand() % 2 == 1 ? newdirection.X * -1 : newdirection.X; // Randomly reverse direction on X axis
-        float directionY = abs(newdirection.Y) == 1 && rand() % 2 == 1 ? newdirection.Y * -1 : newdirection.Y; // Randomly reverse direction on Y axis
-        direction = FVector(directionX, directionY, 0);
-
-        // TODO : trajectoire arrondie pour éviter le mur
-        // Ceci permet une rotation progressive comme voulue, mais le AI tourne toujours dans le même sens
-        // Donc peut rester pris à certains endroits
-        
-        //direction = FVector(direction.X + newdirection.X, direction.Y + newdirection.Y, 0);
-        //direction.Normalize();
+        direction = FVector(direction.X + (newdirection.X * rotationSide), direction.Y + (newdirection.Y * rotationSide), 0);
+        direction.Normalize();
+        GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = GetCharacter()->GetCharacterMovement()->MaxWalkSpeed/3;
         return true;
     }
     return false;
@@ -83,10 +81,15 @@ bool ASDTAIController::DetectDeathFloor()
     bool deathFloorDetected = GetWorld()->LineTraceSingleByObjectType(outHits, rayStart, rayEnd, objectQueryParams, queryParams);
     if (deathFloorDetected && outHits.GetComponent()->GetCollisionObjectType() == COLLISION_DEATH_OBJECT) 
     {
-        direction = FVector::CrossProduct(FVector::UpVector, outHits.Normal);
-        float directionX = abs(direction.X) == 1 && rand() % 2 == 1 ? direction.X * -1 : direction.X; // Randomly reverse direction on X axis
-        float directionY = abs(direction.Y) == 1 && rand() % 2 == 1 ? direction.Y * -1 : direction.Y; // Randomly reverse direction on Y axis
-        direction = FVector(directionX, directionY, 0);
+        if (detectedObstacle == nullptr) detectedObstacle = outHits.GetComponent();
+        else if (detectedObstacle != outHits.GetComponent()) {
+            detectedObstacle = outHits.GetComponent();
+            rotationSide = rand() % 2 == 1 ? 1 : -1;
+        }
+        FVector newdirection = FVector::CrossProduct(FVector::UpVector, outHits.Normal);
+        direction = FVector(direction.X + (newdirection.X * rotationSide), direction.Y + (newdirection.Y * rotationSide), 0);
+        direction.Normalize();
+        GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = GetCharacter()->GetCharacterMovement()->MaxWalkSpeed / 3;
         return true;
     }
     return false;
