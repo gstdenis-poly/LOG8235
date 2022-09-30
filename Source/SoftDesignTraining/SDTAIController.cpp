@@ -11,13 +11,11 @@ void ASDTAIController::Tick(float deltaTime)
     obstacleDetected = obstacleDetected || DetectDeathFloor();
     bool pickupDetected = !obstacleDetected && DetectPickup();
     bool playerDetected = !obstacleDetected && DetectPlayer(SDTUtils::IsPlayerPoweredUp(GetWorld()));
-    MoveForward(deltaTime);
+    MoveForward();
 }
 
-bool ASDTAIController::MoveForward(float deltaTime) 
+void ASDTAIController::MoveForward() 
 {
-
-
     APawn* pawn = GetPawn();
 
     // We change the player rotation according to its current rotation and its direction.
@@ -29,10 +27,7 @@ bool ASDTAIController::MoveForward(float deltaTime)
     GetCharacter()->GetCharacterMovement()->MaxAcceleration = ACCELERATION;
     GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED;
 
-
     pawn->AddMovementInput(direction, 1);
-
-    return false;
 }
 
 bool ASDTAIController::DetectWall() 
