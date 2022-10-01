@@ -6,9 +6,7 @@
 #include "Engine/StaticMeshActor.h"
 #include "SDTCollectible.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class SOFTDESIGNTRAINING_API ASDTCollectible : public AStaticMeshActor
 {
@@ -19,7 +17,16 @@ public:
     void Collect();
     void OnCooldownDone();
     bool IsOnCooldown();
-    bool MoveForward(float deltaTime);
+
+    /// <summary>
+    /// move the collectible towards the current direction
+    /// </summary>
+    void MoveForward(float deltaTime);
+
+    /// <summary>
+    /// Detect a possible collision with wall, change the collectible direction to avoid it.
+    /// </summary>
+    /// <returns>True if a wall is detected</returns>
     bool DetectWall();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
@@ -29,13 +36,16 @@ public:
         bool isMoveable = false;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float ACCELERATION = 250.0;
+        // Acceleration of the colletible, by default 250cm.s^2
+        float ACCELERATION = 250.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float MAX_SPEED = 500.0;
+        // Max speed of the collectible, by default 500cm.s
+        float MAX_SPEED = 500.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-        float COLLISION_DETECTION_DISTANCE = 100;
+        // Distance at which the collectible detects a collision, by default 100cm
+        float COLLISION_DETECTION_DISTANCE = 100.f;
 
     virtual void Tick(float deltaTime) override;
     virtual void BeginPlay() override;
@@ -46,6 +56,6 @@ protected:
     FTimerHandle m_CollectCooldownTimer;
 
 private:
-    float speed = 0;
-    FVector direction = FVector(0, 1, 0);
+    float speed = 0; // Initial speed of collectible
+    FVector direction = FVector(0, 1, 0); // Initial direction of collectible
 };

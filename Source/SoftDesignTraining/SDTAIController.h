@@ -8,9 +8,7 @@
 #include "SDTUtils.h"
 #include "SDTAIController.generated.h"
 
-/**
- *
- */
+
 UCLASS(ClassGroup = AI, config = Game)
 class SOFTDESIGNTRAINING_API ASDTAIController : public AAIController
 {
@@ -54,11 +52,11 @@ public:
     void avoidObstacle(FHitResult outHits);
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (ClampMin = 1, ClampMax = 250))
-        // Acceleration of the AI character, by default 1m.s^-2, can be set between 1 and 10
+        // Acceleration of the AI character, by default 200cm.s^2, can be set between 1 and 250
         float ACCELERATION = 200.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (ClampMin = 1, ClampMax = 600))
-        // Max speed of the AI character, by default 1m.s^-1, can be set between 1 and 10
+        // Max speed of the AI character, by default 500cm.s, can be set between 1 and 600
         float MAX_SPEED = 500.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (ClampMin = 100, ClampMax = 1000))
@@ -72,5 +70,5 @@ private:
     UPrimitiveComponent* detectedObstacle = nullptr; // Keeps track of the current obstacle being rayCast.
     float rotationSide = 1; // Keeps track of the rotation side for the AI
     time_t startTime = time(0); // Current time at controller's initialization
-    FVector direction = FVector(1, 0, 0); // AI's direction
+    FVector direction = FVector(1, 0, 0); // AI's initial direction
 };

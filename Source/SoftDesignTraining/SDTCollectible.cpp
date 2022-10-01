@@ -41,23 +41,25 @@ void ASDTCollectible::Tick(float deltaTime)
     }
 }
 
-bool ASDTCollectible::MoveForward(float deltaTime)
+void ASDTCollectible::MoveForward(float deltaTime)
 {
+    // Move collectible according to its speed and direction
     speed += (ACCELERATION * deltaTime);
     if (speed >= MAX_SPEED) speed = MAX_SPEED;
     FVector disp = speed * deltaTime * direction.GetSafeNormal();
     SetActorLocation(GetActorLocation() + disp, true);
-    return false;
 }
 
 bool ASDTCollectible::DetectWall()
 {
+    // Raycast initialization
     FHitResult outHits;
     FCollisionObjectQueryParams objectQueryParams;
     objectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
     FCollisionQueryParams queryParams = FCollisionQueryParams::DefaultQueryParam;
     queryParams.bReturnPhysicalMaterial = true;
 
+    // Compute the raycast vector
     FVector forward = direction * COLLISION_DETECTION_DISTANCE;
     FVector rayEnd = GetActorLocation() + forward;
 
