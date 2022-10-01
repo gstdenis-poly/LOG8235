@@ -22,7 +22,7 @@ protected:
     FVector m_StartingPosition;
 
 private:
-    int deaths = 0;
-    int collects = 0;
+    int deaths = 0; // Count of character's deaths
+    int collects = 0; // Count of character's pickups
 };
 

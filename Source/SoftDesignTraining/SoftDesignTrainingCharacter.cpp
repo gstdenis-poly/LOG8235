@@ -29,6 +29,7 @@ void ASoftDesignTrainingCharacter::OnBeginOverlap(UPrimitiveComponent* Overlappe
     if (OtherComponent->GetCollisionObjectType() == COLLISION_DEATH_OBJECT)
     {
         SetActorLocation(m_StartingPosition);
+        // Increment and display count of deaths 
         deaths++;
         FString deathsMsg = CharacterName + FString(": ") + FString::FromInt(deaths) + FString(" deaths");
         GEngine->AddOnScreenDebugMessage(CharacterKey, 5.f, FColor::Red, deathsMsg);
@@ -41,6 +42,7 @@ void ASoftDesignTrainingCharacter::OnBeginOverlap(UPrimitiveComponent* Overlappe
         }
 
         collectibleActor->Collect();
+        // Increment and display count of pickups 
         collects++;
         FString collectsMsg = CharacterName + FString(": ") + FString::FromInt(collects) + FString(" collects");
         GEngine->AddOnScreenDebugMessage(CharacterKey, 5.f, FColor::Green, collectsMsg);
