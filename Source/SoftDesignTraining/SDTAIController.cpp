@@ -56,7 +56,7 @@ bool ASDTAIController::DetectWall()
     
     bool wallDetected = GetWorld()->LineTraceSingleByObjectType(outHits, rayStart, rayEnd, objectQueryParams, queryParams);
 
-    if (wallDetected) avoidObstacle(outHits);
+    if (wallDetected) AvoidObstacle(outHits);
     return wallDetected;
 }
 
@@ -78,7 +78,7 @@ bool ASDTAIController::DetectDeathFloor()
     bool deathFloorDetected = GetWorld()->LineTraceSingleByObjectType(outHits, rayStart, rayEnd, objectQueryParams, queryParams);
     
     if (deathFloorDetected && outHits.GetComponent()->GetCollisionObjectType() == COLLISION_DEATH_OBJECT) 
-        avoidObstacle(outHits);
+        AvoidObstacle(outHits);
 
     return deathFloorDetected;
 }
@@ -148,7 +148,7 @@ bool ASDTAIController::DetectPlayer(bool pickupDetected)
     return false;
 }
 
-void ASDTAIController::avoidObstacle(FHitResult outHits) 
+void ASDTAIController::AvoidObstacle(FHitResult outHits) 
 {
     if (detectedObstacle == nullptr) detectedObstacle = outHits.GetComponent();
     else if (detectedObstacle != outHits.GetComponent()) {

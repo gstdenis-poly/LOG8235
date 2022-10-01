@@ -49,7 +49,7 @@ public:
     /// <summary>
     /// Redirects the AI to avoid the obstacle detected (Wall or DeathFloor).
     /// </summary>
-    void avoidObstacle(FHitResult outHits);
+    void AvoidObstacle(FHitResult outHits);
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (ClampMin = 1, ClampMax = 250))
         // Acceleration of the AI character, by default 200cm.s^2, can be set between 1 and 250
