@@ -37,13 +37,13 @@ public:
     bool DetectDeathFloor();
 
     /// <summary>
-    /// Detect if the player is near, run from if powerer up, towards him if not.
+    /// Detect if the player is near, runs from it if powered up, towards him if not.
     /// </summary>
     /// <returns>True if player is near</returns>
     bool DetectPlayer(bool pickupDetected);
 
     /// <summary>
-    /// Detect if the pickup is near run towards it.
+    /// Detect if the pickup is near, runs towards it.
     /// </summary>
     /// <returns>True if pickup is near</returns>
     bool DetectPickup();
@@ -69,7 +69,7 @@ public:
         float speed = 0.f;
 
 private:
-    UPrimitiveComponent* detectedObstacle = nullptr; //Keeps track of the current obstacle being rayCast.
-    float rotationSide = 1;
-    FVector direction = FVector(1, 0, 0);
+    UPrimitiveComponent* detectedObstacle = nullptr; // Keeps track of the current obstacle being rayCast.
+    float rotationSide = 1; // Keeps track of the rotation side for the AI
+    FVector direction = FVector(1, 0, 0); // AI's direction
 };

@@ -12,10 +12,15 @@ void ASDTAIController::Tick(float deltaTime)
     GetCharacter()->GetCharacterMovement()->MaxAcceleration = ACCELERATION;
     GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED;
 
+    // Detects obstacles in front of AI
     bool obstacleDetected = DetectWall();
     obstacleDetected = obstacleDetected || DetectDeathFloor();
+
+    //If no obstacles detected, detects pickup or player
     bool pickupDetected = !obstacleDetected && DetectPickup();
     bool playerDetected = !obstacleDetected && DetectPlayer(SDTUtils::IsPlayerPoweredUp(GetWorld()));
+
+    // Move according to the direction vector
     MoveForward();
 }
 
