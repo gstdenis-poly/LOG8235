@@ -20,5 +20,9 @@ protected:
     virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
     FVector m_StartingPosition;
+
+private:
+    int deaths = 0;
+    int collects = 0;
 };
 

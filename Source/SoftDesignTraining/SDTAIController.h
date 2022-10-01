@@ -71,5 +71,6 @@ public:
 private:
     UPrimitiveComponent* detectedObstacle = nullptr; // Keeps track of the current obstacle being rayCast.
     float rotationSide = 1; // Keeps track of the rotation side for the AI
+    time_t startTime = time(0); // Current time at controller's initialization
     FVector direction = FVector(1, 0, 0); // AI's direction
 };

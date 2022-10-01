@@ -7,6 +7,11 @@
 
 void ASDTAIController::Tick(float deltaTime)
 {
+    // Display timer
+    double elapsedSeconds = difftime(time(0), startTime);
+    FString timerMsg = FString("Elapsed seconds: ") + FString::FromInt(elapsedSeconds);
+    GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Blue, timerMsg);
+
     // We update the MaxAcceleration and MaxWalkSpeed of the characherMovementComponent.
     // If those parameters were not modifiable we could do this only once.
     GetCharacter()->GetCharacterMovement()->MaxAcceleration = ACCELERATION;

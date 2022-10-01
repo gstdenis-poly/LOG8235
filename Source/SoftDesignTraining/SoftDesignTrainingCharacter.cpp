@@ -23,9 +23,15 @@ void ASoftDesignTrainingCharacter::BeginPlay()
 
 void ASoftDesignTrainingCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+    uint64 CharacterKey = GetActorGuid()[1];
+    FString CharacterName = GetActorNameOrLabel();
+
     if (OtherComponent->GetCollisionObjectType() == COLLISION_DEATH_OBJECT)
     {
         SetActorLocation(m_StartingPosition);
+        deaths++;
+        FString deathsMsg = CharacterName + FString(": ") + FString::FromInt(deaths) + FString(" deaths");
+        GEngine->AddOnScreenDebugMessage(CharacterKey, 5.f, FColor::Red, deathsMsg);
     }
     else if(ASDTCollectible* collectibleActor = Cast<ASDTCollectible>(OtherActor))
     {
@@ -35,6 +41,9 @@ void ASoftDesignTrainingCharacter::OnBeginOverlap(UPrimitiveComponent* Overlappe
         }
 
         collectibleActor->Collect();
+        collects++;
+        FString collectsMsg = CharacterName + FString(": ") + FString::FromInt(collects) + FString(" collects");
+        GEngine->AddOnScreenDebugMessage(CharacterKey, 5.f, FColor::Green, collectsMsg);
     }
     else if (ASoftDesignTrainingMainCharacter* mainCharacter = Cast<ASoftDesignTrainingMainCharacter>(OtherActor))
     {
