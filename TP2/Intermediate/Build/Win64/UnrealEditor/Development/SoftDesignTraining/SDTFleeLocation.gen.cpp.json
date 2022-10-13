@@ -1,0 +1,15 @@
+{
+    "Version": "1.1",
+    "Data": {
+        "Source": "c:\\users\\gastd\\desktop\\log8235\\tp2\\intermediate\\build\\win64\\unrealeditor\\inc\\softdesigntraining\\sdtfleelocation.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\users\\gastd\\desktop\\log8235\\tp2\\intermediate\\build\\win64\\softdesigntrainingeditor\\development\\engine\\sharedpch.engine.shadowerrors.h.pch",
+        "Includes": [
+            "c:\\users\\gastd\\desktop\\log8235\\tp2\\intermediate\\build\\win64\\unrealeditor\\development\\softdesigntraining\\definitions.softdesigntraining.h",
+            "c:\\users\\gastd\\desktop\\log8235\\tp2\\source\\softdesigntraining\\sdtfleelocation.h",
+            "c:\\users\\gastd\\desktop\\log8235\\tp2\\intermediate\\build\\win64\\unrealeditor\\inc\\softdesigntraining\\sdtfleelocation.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

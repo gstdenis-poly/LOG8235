@@ -1,0 +1,15 @@
+{
+    "Version": "1.1",
+    "Data": {
+        "Source": "c:\\users\\gastd\\desktop\\log8235\\tp2\\intermediate\\build\\win64\\unrealeditor\\inc\\softdesigntraining\\sdtanimnotify_jumpend.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\users\\gastd\\desktop\\log8235\\tp2\\intermediate\\build\\win64\\softdesigntrainingeditor\\development\\engine\\sharedpch.engine.shadowerrors.h.pch",
+        "Includes": [
+            "c:\\users\\gastd\\desktop\\log8235\\tp2\\intermediate\\build\\win64\\unrealeditor\\development\\softdesigntraining\\definitions.softdesigntraining.h",
+            "c:\\users\\gastd\\desktop\\log8235\\tp2\\source\\softdesigntraining\\sdtanimnotify_jumpend.h",
+            "c:\\users\\gastd\\desktop\\log8235\\tp2\\intermediate\\build\\win64\\unrealeditor\\inc\\softdesigntraining\\sdtanimnotify_jumpend.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}
