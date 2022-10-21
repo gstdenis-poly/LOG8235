@@ -52,6 +52,7 @@ protected:
     void OnMoveToTarget();
     void GetHightestPriorityDetectionHit(const TArray<FHitResult>& hits, FHitResult& outDetectionHit);
     void UpdatePlayerInteraction(float deltaTime);
+    UNavigationPath* GetPathToClosestCollectible();
 
 private:
     virtual void GoToBestTarget(float deltaTime) override;
