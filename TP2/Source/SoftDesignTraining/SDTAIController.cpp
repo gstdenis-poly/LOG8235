@@ -20,8 +20,8 @@ ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
 void ASDTAIController::GoToBestTarget(float deltaTime)
 {
     //Move to target depending on current behavior
-
-    ShowNavigationPath(); //seulement pour tester, à enlever une fois le déplacement implémenté
+    ShowNavigationPath(); // juste pour test rapide, mais à enlever
+    MoveToActor(targetActor);
 }
 
 UNavigationPath* ASDTAIController::GetPathToClosestCollectible()
@@ -32,16 +32,20 @@ UNavigationPath* ASDTAIController::GetPathToClosestCollectible()
 
     float currentPathLength = 1000000000000.f;
     UNavigationPath* shortestPath = nullptr;
+    AActor* closestActor = collectibles[0];
 
     //Computing path for each collectible and finding the closest one
     for (AActor* collectible : collectibles) {
-        UNavigationPath* collectiblePath = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), collectible->GetActorLocation());
+        UNavigationSystemV1* navigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+        UNavigationPath* collectiblePath = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), collectible->GetActorLocation());
         float pathLength = collectiblePath->GetPathLength();
         if (pathLength < currentPathLength) {
             shortestPath = collectiblePath;
             currentPathLength = pathLength;
+            closestActor = collectible;
         }
     }
+    targetActor = closestActor;
     return shortestPath;
 }
 

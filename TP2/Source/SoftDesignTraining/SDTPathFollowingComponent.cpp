@@ -25,6 +25,7 @@ void USDTPathFollowingComponent::FollowPathSegment(float DeltaTime)
     else
     {
         //update navigation along path
+        Super::FollowPathSegment(DeltaTime);
     }
 }
 
@@ -39,10 +40,12 @@ void USDTPathFollowingComponent::SetMoveSegment(int32 segmentStartIndex)
     if (SDTUtils::HasJumpFlag(segmentStart) && FNavMeshNodeFlags(segmentStart.Flags).IsNavLink())
     {
         //Handle starting jump
+        Cast<UCharacterMovementComponent>(MovementComp)->SetMovementMode(MOVE_Flying);
     }
     else
     {
         //Handle normal segments
+        Cast<UCharacterMovementComponent>(MovementComp)->SetMovementMode(MOVE_Walking);
     }
 }
 
