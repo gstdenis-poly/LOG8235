@@ -20,7 +20,8 @@ void USDTPathFollowingComponent::FollowPathSegment(float DeltaTime)
 
     if (SDTUtils::HasJumpFlag(segmentStart))
     {
-        //update jump
+        GEngine->AddOnScreenDebugMessage(23918, 1.f, FColor::Red, TEXT("FLYING"));
+
     }
     else
     {
