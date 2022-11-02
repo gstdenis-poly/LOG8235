@@ -20,9 +20,7 @@ ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
 void ASDTAIController::GoToBestTarget(float deltaTime)
 {
     //Move to target depending on current behavior
-    //ShowNavigationPath(); // juste pour test rapide, mais à enlever
-    GetPathToClosestCollectible();
-    MoveToActor(targetActor);
+    MoveToLocation(targetPosition);
 }
 
 UNavigationPath* ASDTAIController::GetPathToClosestCollectible()
@@ -46,7 +44,44 @@ UNavigationPath* ASDTAIController::GetPathToClosestCollectible()
             closestActor = collectible;
         }
     }
-    targetActor = closestActor;
+    targetPosition = closestActor->GetActorLocation();
+    return shortestPath;
+}
+
+UNavigationPath* ASDTAIController::GetPathToActor(FVector actorPosition)
+{
+    UNavigationSystemV1* navigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+    UNavigationPath* pathToActor = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), actorPosition);
+    targetPosition = actorPosition;
+    return pathToActor;
+}
+
+UNavigationPath* ASDTAIController::GetPathToBestFleePoint(FVector actorPosition)
+{
+    //Getting the position of all the fleePoints
+    TArray<AActor*> fleePoints = TArray<AActor*>();
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASDTFleeLocation::StaticClass(), fleePoints);
+
+    float currentPathLength = 1000000000000.f;
+    UNavigationPath* shortestPath = nullptr;
+    AActor* closestActor = fleePoints[0];
+
+    //Computing path for each fleePoint and finding the closest one that doesn't intersect the player
+    for (AActor* fleePoint : fleePoints) {
+        UNavigationSystemV1* navigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+        UNavigationPath* fleePath = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), fleePoint->GetActorLocation());
+        float pathLength = fleePath->GetPathLength();
+
+        FVector distanceToPlayer = actorPosition - fleePoint->GetActorLocation();
+        FVector distanceToAI = GetPawn()->GetActorLocation() - fleePoint->GetActorLocation();
+
+        if (distanceToPlayer.Size() > distanceToAI.Size() && pathLength < currentPathLength) {
+            shortestPath = fleePath;
+            currentPathLength = pathLength;
+            closestActor = fleePoint;
+        }
+    }
+    targetPosition = closestActor->GetActorLocation();
     return shortestPath;
 }
 
@@ -65,7 +100,10 @@ void ASDTAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollow
 void ASDTAIController::ShowNavigationPath()
 {
     //Show current navigation path DrawDebugLine and DrawDebugSphere
-    UNavigationPath* path = GetPathToClosestCollectible();
+    
+    UNavigationSystemV1* navigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+    UNavigationPath* path = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), targetPosition);
+
     const TArray<FVector> points = path->PathPoints;
     if (points.Num() > 0) {
         FVector startPoint = points[0];
@@ -110,6 +148,7 @@ void ASDTAIController::UpdatePlayerInteraction(float deltaTime)
     GetHightestPriorityDetectionHit(allDetectionHits, detectionHit);
 
     //Set behavior based on hit
+    SetPlayerBehavior(detectionHit);
 
     DrawDebugCapsule(GetWorld(), detectionStartLocation + m_DetectionCapsuleHalfLength * selfPawn->GetActorForwardVector(), m_DetectionCapsuleHalfLength, m_DetectionCapsuleRadius, selfPawn->GetActorQuat() * selfPawn->GetActorUpVector().ToOrientationQuat(), FColor::Blue);
 }
@@ -124,12 +163,50 @@ void ASDTAIController::GetHightestPriorityDetectionHit(const TArray<FHitResult>&
             {
                 //we can't get more important than the player
                 outDetectionHit = hit;
+                GEngine->AddOnScreenDebugMessage(50, 1.f, FColor::Red, TEXT("COLLISION PLAYER"));
                 return;
             }
             else if (component->GetCollisionObjectType() == COLLISION_COLLECTIBLE)
             {
                 outDetectionHit = hit;
             }
+        }
+    }
+}
+
+void ASDTAIController::SetPlayerBehavior(FHitResult Hit) 
+{
+    if (Hit.GetComponent()) {
+        // cas 1 : player detected
+        if (Hit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
+            GEngine->AddOnScreenDebugMessage(50, 1.f, FColor::Red, TEXT("COLLISION PLAYER BEHAVIOR"));
+
+            if (SDTUtils::IsPlayerPoweredUp(GetWorld())) {
+                GEngine->AddOnScreenDebugMessage(20, 1.f, FColor::Red, TEXT("FLEE POINT"));
+                //comportement de fuite vers point de fuite le plus pertinent
+                GetPathToBestFleePoint(Hit.GetActor()->GetActorLocation());
+            }
+            else {
+                //comportement de poursuite
+                bool playerIsVisible = SDTUtils::Raycast(GetWorld(), GetPawn()->GetActorLocation(), Hit.GetActor()->GetActorLocation());
+                if (playerIsVisible) {
+                    // Joueur visible et non boosté = calcul path et pourchasse
+                    lastKnownPosition = Hit.GetActor()->GetActorLocation();
+                    GEngine->AddOnScreenDebugMessage(30, 1.f, FColor::Green, TEXT("PLAYER VISIBLE"));
+                    GetPathToActor(lastKnownPosition);
+                }
+                else if (lastKnownPosition.Size() != 0) {
+                    // Joueur non visible et non boosté = déplacement vers LKP
+                    GEngine->AddOnScreenDebugMessage(40, 1.f, FColor::Green, TEXT("LAST KNOWN POSITION"));
+                    GetPathToActor(lastKnownPosition);
+                }
+            }
+        }
+
+        // cas 2 : collectible detected
+        else if (Hit.GetComponent()->GetCollisionObjectType() == COLLISION_COLLECTIBLE) {
+            GEngine->AddOnScreenDebugMessage(10, 1.f, FColor::Blue, TEXT("COLLECTIBLE"));
+            GetPathToClosestCollectible();
         }
     }
 }

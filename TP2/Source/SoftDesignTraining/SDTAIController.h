@@ -44,7 +44,8 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AI)
     bool Landing = false;
 
-    AActor* targetActor;
+    FVector targetPosition;
+    FVector lastKnownPosition;
 
 public:
     virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
@@ -54,10 +55,13 @@ protected:
     void OnMoveToTarget();
     void GetHightestPriorityDetectionHit(const TArray<FHitResult>& hits, FHitResult& outDetectionHit);
     void UpdatePlayerInteraction(float deltaTime);
-    UNavigationPath* GetPathToClosestCollectible();
 
 private:
     virtual void GoToBestTarget(float deltaTime) override;
     virtual void ChooseBehavior(float deltaTime) override;
     virtual void ShowNavigationPath() override;
+    void SetPlayerBehavior(FHitResult Hit);
+    UNavigationPath* GetPathToClosestCollectible();
+    UNavigationPath* GetPathToActor(FVector actorPosition);
+    UNavigationPath* GetPathToBestFleePoint(FVector actorPosition);
 };
