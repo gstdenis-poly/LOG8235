@@ -20,7 +20,8 @@ ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
 void ASDTAIController::GoToBestTarget(float deltaTime)
 {
     //Move to target depending on current behavior
-    ShowNavigationPath(); // juste pour test rapide, mais à enlever
+    //ShowNavigationPath(); // juste pour test rapide, mais à enlever
+    GetPathToClosestCollectible();
     MoveToActor(targetActor);
 }
 
@@ -66,11 +67,13 @@ void ASDTAIController::ShowNavigationPath()
     //Show current navigation path DrawDebugLine and DrawDebugSphere
     UNavigationPath* path = GetPathToClosestCollectible();
     const TArray<FVector> points = path->PathPoints;
-    FVector startPoint = points[0];
-    for (FVector point : points) {
-        DrawDebugLine(GetWorld(), startPoint, point, FColor::Green);
-        DrawDebugSphere(GetWorld(), point, 10.0f, 10, FColor::Red);
-        startPoint = point;
+    if (points.Num() > 0) {
+        FVector startPoint = points[0];
+        for (FVector point : points) {
+            DrawDebugLine(GetWorld(), startPoint, point, FColor::Green);
+            DrawDebugSphere(GetWorld(), point, 10.0f, 10, FColor::Red);
+            startPoint = point;
+        }
     }
 }
 

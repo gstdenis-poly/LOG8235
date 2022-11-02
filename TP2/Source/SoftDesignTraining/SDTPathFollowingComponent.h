@@ -20,4 +20,6 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AI)
         float m_JumpProgressRatio = 0.f;
+
+    bool isJumping = false;
 };

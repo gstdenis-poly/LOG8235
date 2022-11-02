@@ -26,7 +26,10 @@ void USDTPathFollowingComponent::FollowPathSegment(float DeltaTime)
         const FNavPathPoint& segmentEnd = points[MoveSegmentStartIndex + 1];
         const FVector toTarget = segmentEnd.Location - segmentStart.Location;
 
-        m_JumpProgressRatio += DeltaTime;
+        //valeur 10 totalement arbitraire trouvée par essais-erreurs avec le code pour que le saut fonctionne en tout temps
+        //Le résultat est horrible, car téléportation du AI pas fluide
+        //TODO : fix
+        m_JumpProgressRatio += 10 * DeltaTime; 
         float curvePosition = Cast<ASDTAIController>(GetOwner())->JumpCurve->GetFloatValue(m_JumpProgressRatio);
 
         //Move actor to a new position while jumping along the curve
