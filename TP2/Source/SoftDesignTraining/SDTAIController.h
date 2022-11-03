@@ -44,6 +44,8 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AI)
     bool Landing = false;
 
+    float movementSpeed = 600.f;
+
     FVector targetPosition;
     FVector lastKnownPosition;
 

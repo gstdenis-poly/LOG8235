@@ -20,6 +20,7 @@ ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
 void ASDTAIController::GoToBestTarget(float deltaTime)
 {
     //Move to target depending on current behavior
+    GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = movementSpeed;
     MoveToLocation(targetPosition);
 }
 
@@ -38,7 +39,7 @@ UNavigationPath* ASDTAIController::GetPathToClosestCollectible()
         UNavigationSystemV1* navigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
         UNavigationPath* collectiblePath = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), collectible->GetActorLocation());
         float pathLength = collectiblePath->GetPathLength();
-        if (pathLength < currentPathLength) {
+        if (pathLength < currentPathLength && !Cast<ASDTCollectible>(collectible)->IsOnCooldown()) {
             shortestPath = collectiblePath;
             currentPathLength = pathLength;
             closestActor = collectible;
@@ -100,7 +101,6 @@ void ASDTAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollow
 void ASDTAIController::ShowNavigationPath()
 {
     //Show current navigation path DrawDebugLine and DrawDebugSphere
-    
     UNavigationSystemV1* navigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
     UNavigationPath* path = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), targetPosition);
 
@@ -163,7 +163,8 @@ void ASDTAIController::GetHightestPriorityDetectionHit(const TArray<FHitResult>&
             {
                 //we can't get more important than the player
                 outDetectionHit = hit;
-                GEngine->AddOnScreenDebugMessage(50, 1.f, FColor::Red, TEXT("COLLISION PLAYER"));
+                if(lastKnownPosition.Size() == 0) lastKnownPosition = hit.GetActor()->GetActorLocation();
+                //GEngine->AddOnScreenDebugMessage(50, 1.f, FColor::Red, TEXT("COLLISION PLAYER"));
                 return;
             }
             else if (component->GetCollisionObjectType() == COLLISION_COLLECTIBLE)
@@ -179,10 +180,14 @@ void ASDTAIController::SetPlayerBehavior(FHitResult Hit)
     if (Hit.GetComponent()) {
         // cas 1 : player detected
         if (Hit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
-            GEngine->AddOnScreenDebugMessage(50, 1.f, FColor::Red, TEXT("COLLISION PLAYER BEHAVIOR"));
+            movementSpeed = 600.f; // Arbitrary Run Speed
+
+            //GEngine->AddOnScreenDebugMessage(50, 1.f, FColor::Red, TEXT("COLLISION PLAYER BEHAVIOR"));
 
             if (SDTUtils::IsPlayerPoweredUp(GetWorld())) {
-                GEngine->AddOnScreenDebugMessage(20, 1.f, FColor::Red, TEXT("FLEE POINT"));
+
+                //GEngine->AddOnScreenDebugMessage(20, 1.f, FColor::Red, TEXT("FLEE POINT"));
+                
                 //comportement de fuite vers point de fuite le plus pertinent
                 GetPathToBestFleePoint(Hit.GetActor()->GetActorLocation());
             }
@@ -192,21 +197,29 @@ void ASDTAIController::SetPlayerBehavior(FHitResult Hit)
                 if (playerIsVisible) {
                     // Joueur visible et non boosté = calcul path et pourchasse
                     lastKnownPosition = Hit.GetActor()->GetActorLocation();
-                    GEngine->AddOnScreenDebugMessage(30, 1.f, FColor::Green, TEXT("PLAYER VISIBLE"));
+                    //GEngine->AddOnScreenDebugMessage(30, 1.f, FColor::Green, TEXT("PLAYER VISIBLE"));
                     GetPathToActor(lastKnownPosition);
                 }
                 else if (lastKnownPosition.Size() != 0) {
                     // Joueur non visible et non boosté = déplacement vers LKP
-                    GEngine->AddOnScreenDebugMessage(40, 1.f, FColor::Green, TEXT("LAST KNOWN POSITION"));
+                    //GEngine->AddOnScreenDebugMessage(40, 1.f, FColor::Green, TEXT("LAST KNOWN POSITION"));
                     GetPathToActor(lastKnownPosition);
+                    //if reached LastKnownPosition
+                    if ((GetPawn()->GetActorLocation() - lastKnownPosition).Size() < 10) {
+                        lastKnownPosition = FVector::ZeroVector;
+                        AIStateInterrupted();
+                    }
                 }
             }
         }
 
         // cas 2 : collectible detected
         else if (Hit.GetComponent()->GetCollisionObjectType() == COLLISION_COLLECTIBLE) {
-            GEngine->AddOnScreenDebugMessage(10, 1.f, FColor::Blue, TEXT("COLLECTIBLE"));
+            //GEngine->AddOnScreenDebugMessage(10, 1.f, FColor::Blue, TEXT("COLLECTIBLE"));
+
+            movementSpeed = 200.f; // Arbitrary Walking Speed
             GetPathToClosestCollectible();
+            ShowNavigationPath();
         }
     }
 }
