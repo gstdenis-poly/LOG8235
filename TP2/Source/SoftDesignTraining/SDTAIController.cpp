@@ -134,6 +134,7 @@ void ASDTAIController::UpdatePlayerInteraction(float deltaTime)
 	ACharacter* playerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	//if (!playerCharacter)
 	//    return;
+	//if no player, juste gather power ups
 
 	FVector detectionStartLocation = selfPawn->GetActorLocation() + selfPawn->GetActorForwardVector() * m_DetectionCapsuleForwardStartingOffset;
 	FVector detectionEndLocation = detectionStartLocation + selfPawn->GetActorForwardVector() * m_DetectionCapsuleHalfLength * 2;
@@ -178,50 +179,59 @@ void ASDTAIController::GetHightestPriorityDetectionHit(const TArray<FHitResult>&
 
 void ASDTAIController::SetPlayerBehavior(FHitResult Hit)
 {
-	if (Hit.GetComponent()) {
-		// cas 1 : player detected
-		if (Hit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
-			movementSpeed = 600.f; // Arbitrary Run Speed
+	if (!SDTUtils::IsPlayerPoweredUp(GetWorld())) {
+		isFleeing = false;
+	}
+		if (Hit.GetComponent()) {
+			// cas 1 : player detected
+			if (Hit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
+				movementSpeed = 600.f; // Arbitrary Run Speed
 
-			//GEngine->AddOnScreenDebugMessage(50, 1.f, FColor::Red, TEXT("COLLISION PLAYER BEHAVIOR"));
+				//GEngine->AddOnScreenDebugMessage(50, 1.f, FColor::Red, TEXT("COLLISION PLAYER BEHAVIOR"));
 
-			if (SDTUtils::IsPlayerPoweredUp(GetWorld())) {
+				if (SDTUtils::IsPlayerPoweredUp(GetWorld())) {
 
-				//GEngine->AddOnScreenDebugMessage(20, 1.f, FColor::Red, TEXT("FLEE POINT"));
+					GEngine->AddOnScreenDebugMessage(20, 1.f, FColor::Red, TEXT("FLEE POINT"));
 
-				//comportement de fuite vers point de fuite le plus pertinent
-				GetPathToBestFleePoint(Hit.GetActor()->GetActorLocation());
-			}
-			else {
+					//comportement de fuite vers point de fuite le plus pertinent
+					lastKnownPosition = FVector::ZeroVector;
 
-				// Joueur visible et non boosté = calcul path et pourchasse
-				lastKnownPosition = Hit.GetActor()->GetActorLocation();
-				//GEngine->AddOnScreenDebugMessage(30, 1.f, FColor::Green, TEXT("PLAYER VISIBLE"));
-				GetPathToActor(lastKnownPosition);
+					GetPathToBestFleePoint(Hit.GetActor()->GetActorLocation());
+					isFleeing = true;
+				}
+				else {
+
+					// Joueur visible et non boosté = calcul path et pourchasse
+					lastKnownPosition = Hit.GetActor()->GetActorLocation();
+					//GEngine->AddOnScreenDebugMessage(30, 1.f, FColor::Green, TEXT("PLAYER VISIBLE"));
+					//GetPathToActor(lastKnownPosition);
+
+				}
 
 			}
 
 		}
+		if (!isFleeing) {
+		if (lastKnownPosition != FVector::ZeroVector) {
+			// on va a last
+			// si proche on met a 0
+			GetPathToActor(lastKnownPosition);
+			//if reached LastKnownPosition
+			if (FVector::Dist(GetPawn()->GetActorLocation(), lastKnownPosition) < 60) {
+				lastKnownPosition = FVector::ZeroVector;
+				AIStateInterrupted();
+			}
+		}
+		else {
+			// si pas de player on va vers les collectibles
+		//GEngine->AddOnScreenDebugMessage(10, 1.f, FColor::Blue, TEXT("COLLECTIBLE"));
 
-	}
-	if (lastKnownPosition != FVector::ZeroVector) {
-		// on va a last
-		// si proche on met a 0
-		GetPathToActor(lastKnownPosition);
-		//if reached LastKnownPosition
-		if (FVector::Dist(GetPawn()->GetActorLocation(), lastKnownPosition) < 60) {
-			lastKnownPosition = FVector::ZeroVector;
-			AIStateInterrupted();
+			movementSpeed = 200.f; // Arbitrary Walking Speed
+			GetPathToClosestCollectible();
+			ShowNavigationPath();
 		}
 	}
-	else {
-		// si pas de player on va vers les collectibles
-	//GEngine->AddOnScreenDebugMessage(10, 1.f, FColor::Blue, TEXT("COLLECTIBLE"));
-
-		movementSpeed = 200.f; // Arbitrary Walking Speed
-		GetPathToClosestCollectible();
-		ShowNavigationPath();
-	}
+	
 
 }
 

@@ -49,6 +49,8 @@ public:
 
     FVector targetPosition;
     FVector lastKnownPosition;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
+        bool isFleeing = false;
 
 public:
     virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
