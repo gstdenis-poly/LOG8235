@@ -44,6 +44,7 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AI)
     bool Landing = false;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AI)
     float movementSpeed = 600.f;
 
     FVector targetPosition;
