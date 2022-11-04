@@ -21,8 +21,15 @@ void ASDTAIController::GoToBestTarget(float deltaTime)
 {
 	//Move to target depending on current behavior
 	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = movementSpeed;
-	if (targetPosition.X != 0 && targetPosition.Y != 0)
+	if (targetPosition.X != 0 && targetPosition.Y != 0) {
 		MoveToLocation(targetPosition);
+		if (AtJumpSegment) {
+			m_ReachedTarget = false;
+		}
+		else {
+			m_ReachedTarget = true;
+		}
+	}
 }
 
 UNavigationPath* ASDTAIController::GetPathToClosestCollectible()
