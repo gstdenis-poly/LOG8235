@@ -218,7 +218,7 @@ void ASDTAIController::SetPlayerBehavior(FHitResult Hit)
 			}
 
 		}
-		if (!isFleeing) {
+	if (!isFleeing) {
 		if (lastKnownPosition != FVector::ZeroVector) {
 			// on va a last
 			// si proche on met a 0
@@ -231,15 +231,11 @@ void ASDTAIController::SetPlayerBehavior(FHitResult Hit)
 		}
 		else {
 			// si pas de player on va vers les collectibles
-		//GEngine->AddOnScreenDebugMessage(10, 1.f, FColor::Blue, TEXT("COLLECTIBLE"));
-
 			movementSpeed = 200.f; // Arbitrary Walking Speed
 			GetPathToClosestCollectible();
 			ShowNavigationPath();
 		}
 	}
-	
-
 }
 
 void ASDTAIController::AIStateInterrupted()
