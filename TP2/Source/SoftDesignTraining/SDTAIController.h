@@ -49,6 +49,13 @@ public:
 
     FVector targetPosition;
     FVector lastKnownPosition;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AI)
+        float walkSpeed = 200.f;
+    
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AI)
+        float runSpeed = 500.f;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
         bool isFleeing = false;
 

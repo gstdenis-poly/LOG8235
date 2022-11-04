@@ -21,7 +21,7 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AI)
         float m_JumpProgressRatio = 0.f;
 
-    bool isJumping = false;
     FVector currentStart = FVector::ZeroVector;
     FVector currentEnd = FVector::ZeroVector;
+    float JumpOffset = 50.f;
 };

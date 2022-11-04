@@ -17,12 +17,11 @@ void USDTPathFollowingComponent::FollowPathSegment(float DeltaTime)
 {
     const TArray<FNavPathPoint>& points = Path->GetPathPoints();
     const FNavPathPoint& segmentStart = points[MoveSegmentStartIndex];
-    const FVector startingJumpPoint = segmentStart.Location;
-
     ASDTAIController* controller = Cast<ASDTAIController>(GetOwner());
 
     if (SDTUtils::HasJumpFlag(segmentStart) || controller->InAir)
     {
+        //If we are starting to jump
         if (!controller->InAir) {
             m_JumpProgressRatio = 0;
             controller->InAir = true;
@@ -31,22 +30,22 @@ void USDTPathFollowingComponent::FollowPathSegment(float DeltaTime)
             currentEnd = points[MoveSegmentStartIndex + 1].Location;
         }
 
+        //Jump distance
         const FVector toTarget = currentEnd - currentStart;
 
         m_JumpProgressRatio +=  DeltaTime; 
         float curvePosition = Cast<ASDTAIController>(GetOwner())->JumpCurve->GetFloatValue(m_JumpProgressRatio);
 
-        //Move actor to a new position while jumping along the curve
+        //Move actor to the new computed position while jumping along the curve
         float nextX = currentStart.X + m_JumpProgressRatio * toTarget.X;
         float nextY = currentStart.Y + m_JumpProgressRatio * toTarget.Y;
-        float nextZ = currentStart.Z + controller->JumpApexHeight * curvePosition + 50;
+        float nextZ = currentStart.Z + controller->JumpApexHeight * curvePosition + JumpOffset;
 
-        controller->GetPawn()->SetActorLocation(FVector(nextX,nextY,nextZ));
+        controller->GetPawn()->SetActorLocation(FVector(nextX, nextY, nextZ));
 
+        //End of the jump
         if (m_JumpProgressRatio >= 1)
         {
-            GEngine->AddOnScreenDebugMessage(26, 1.f, FColor::Red, TEXT("LANDING"));
-            controller->Landing = true;
             controller->AtJumpSegment = false;
             controller->InAir = false;
             m_JumpProgressRatio = 0;
@@ -69,15 +68,15 @@ void USDTPathFollowingComponent::SetMoveSegment(int32 segmentStartIndex)
 
     ASDTAIController* controller = Cast<ASDTAIController>(GetOwner());
 
-        if (SDTUtils::HasJumpFlag(segmentStart) && FNavMeshNodeFlags(segmentStart.Flags).IsNavLink() || controller->InAir)
-        {
-            //Handle starting jump
-            Cast<UCharacterMovementComponent>(MovementComp)->SetMovementMode(MOVE_Flying);
-        }
-        else
-        {
-            //Handle normal segments
-            Cast<UCharacterMovementComponent>(MovementComp)->SetMovementMode(MOVE_Walking);
-        }
+    if (SDTUtils::HasJumpFlag(segmentStart) && FNavMeshNodeFlags(segmentStart.Flags).IsNavLink() || controller->InAir)
+    {
+        //Handle starting jump
+        Cast<UCharacterMovementComponent>(MovementComp)->SetMovementMode(MOVE_Flying);
+    }
+    else
+    {
+        //Handle normal segments
+        Cast<UCharacterMovementComponent>(MovementComp)->SetMovementMode(MOVE_Walking);
+    }
 }
 

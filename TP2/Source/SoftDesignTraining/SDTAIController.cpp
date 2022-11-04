@@ -19,16 +19,16 @@ ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
 
 void ASDTAIController::GoToBestTarget(float deltaTime)
 {
-	//Move to target depending on current behavior
+	//Set the movement speed based on the selected behavior
 	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = movementSpeed;
+
+	//Move to target depending on current behavior
 	if (targetPosition.X != 0 && targetPosition.Y != 0) {
 		MoveToLocation(targetPosition);
-		if (AtJumpSegment) {
-			m_ReachedTarget = false;
-		}
-		else {
-			m_ReachedTarget = true;
-		}
+		ShowNavigationPath();
+
+		if (AtJumpSegment) m_ReachedTarget = false;
+		else m_ReachedTarget = true;
 	}
 }
 
@@ -42,7 +42,7 @@ UNavigationPath* ASDTAIController::GetPathToClosestCollectible()
 	UNavigationPath* shortestPath = nullptr;
 	AActor* closestActor = collectibles[0];
 
-	//Computing path for each collectible and finding the closest one
+	//Computing path for each collectible and finding the closest one to the AI that is not on cool down
 	for (AActor* collectible : collectibles) {
 		UNavigationSystemV1* navigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
 		UNavigationPath* collectiblePath = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), collectible->GetActorLocation());
@@ -59,6 +59,7 @@ UNavigationPath* ASDTAIController::GetPathToClosestCollectible()
 
 UNavigationPath* ASDTAIController::GetPathToActor(FVector actorPosition)
 {
+	//Finding the path to the play and targeting the actorPosition
 	UNavigationSystemV1* navigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
 	UNavigationPath* pathToActor = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), actorPosition);
 	targetPosition = actorPosition;
@@ -108,10 +109,11 @@ void ASDTAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollow
 
 void ASDTAIController::ShowNavigationPath()
 {
-	//Show current navigation path DrawDebugLine and DrawDebugSphere
+	//Finding the current path followed by the player based on the targetPosition
 	UNavigationSystemV1* navigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
 	UNavigationPath* path = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), targetPosition);
 
+	//Show current navigation path DrawDebugLine and DrawDebugSphere
 	const TArray<FVector> points = path->PathPoints;
 	if (points.Num() > 0) {
 		FVector startPoint = points[0];
@@ -139,9 +141,10 @@ void ASDTAIController::UpdatePlayerInteraction(float deltaTime)
 		return;
 
 	ACharacter* playerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	//If no player, juste gather power ups
+	//Commented to make the simulation mode work
 	//if (!playerCharacter)
 	//    return;
-	//if no player, juste gather power ups
 
 	FVector detectionStartLocation = selfPawn->GetActorLocation() + selfPawn->GetActorForwardVector() * m_DetectionCapsuleForwardStartingOffset;
 	FVector detectionEndLocation = detectionStartLocation + selfPawn->GetActorForwardVector() * m_DetectionCapsuleHalfLength * 2;
@@ -172,8 +175,8 @@ void ASDTAIController::GetHightestPriorityDetectionHit(const TArray<FHitResult>&
 			{
 				//we can't get more important than the player
 				outDetectionHit = hit;
+				//If no previous lastKnowPosition
 				if (lastKnownPosition.Size() == 0) lastKnownPosition = hit.GetActor()->GetActorLocation();
-				//GEngine->AddOnScreenDebugMessage(50, 1.f, FColor::Red, TEXT("COLLISION PLAYER"));
 				return;
 			}
 			else if (component->GetCollisionObjectType() == COLLISION_COLLECTIBLE)
@@ -189,51 +192,41 @@ void ASDTAIController::SetPlayerBehavior(FHitResult Hit)
 	if (!SDTUtils::IsPlayerPoweredUp(GetWorld())) {
 		isFleeing = false;
 	}
-		if (Hit.GetComponent()) {
-			// cas 1 : player detected
-			if (Hit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
-				movementSpeed = 600.f; // Arbitrary Run Speed
 
-				//GEngine->AddOnScreenDebugMessage(50, 1.f, FColor::Red, TEXT("COLLISION PLAYER BEHAVIOR"));
+	if (Hit.GetComponent()) {
+		// If we detected the player
+		if (Hit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
 
-				if (SDTUtils::IsPlayerPoweredUp(GetWorld())) {
+			movementSpeed = runSpeed;
 
-					GEngine->AddOnScreenDebugMessage(20, 1.f, FColor::Red, TEXT("FLEE POINT"));
-
-					//comportement de fuite vers point de fuite le plus pertinent
-					lastKnownPosition = FVector::ZeroVector;
-
-					GetPathToBestFleePoint(Hit.GetActor()->GetActorLocation());
-					isFleeing = true;
-				}
-				else {
-
-					// Joueur visible et non boosté = calcul path et pourchasse
-					lastKnownPosition = Hit.GetActor()->GetActorLocation();
-					//GEngine->AddOnScreenDebugMessage(30, 1.f, FColor::Green, TEXT("PLAYER VISIBLE"));
-					//GetPathToActor(lastKnownPosition);
-
-				}
-
+			if (SDTUtils::IsPlayerPoweredUp(GetWorld())) {
+				//fleeing mode
+				lastKnownPosition = FVector::ZeroVector;
+				GetPathToBestFleePoint(Hit.GetActor()->GetActorLocation());
+				isFleeing = true;
 			}
-
+			else {
+				//updating the lastKnownPosition
+				lastKnownPosition = Hit.GetActor()->GetActorLocation();
+			}
 		}
+	}
+
 	if (!isFleeing) {
 		if (lastKnownPosition != FVector::ZeroVector) {
-			// on va a last
-			// si proche on met a 0
+			//Moving towards lastKnownPosition
 			GetPathToActor(lastKnownPosition);
-			//if reached LastKnownPosition
+
+			//if we reached the lastKnownPosition, interrupt the behavior
 			if (FVector::Dist(GetPawn()->GetActorLocation(), lastKnownPosition) < 60) {
 				lastKnownPosition = FVector::ZeroVector;
 				AIStateInterrupted();
 			}
 		}
 		else {
-			// si pas de player on va vers les collectibles
-			movementSpeed = 200.f; // Arbitrary Walking Speed
+			//No lastKnownPosition so we are chasing collectibles in walking speed
+			movementSpeed = walkSpeed;
 			GetPathToClosestCollectible();
-			ShowNavigationPath();
 		}
 	}
 }
