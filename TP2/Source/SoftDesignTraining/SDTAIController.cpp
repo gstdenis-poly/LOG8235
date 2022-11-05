@@ -22,14 +22,9 @@ void ASDTAIController::GoToBestTarget(float deltaTime)
 	//Set the movement speed based on the selected behavior
 	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = movementSpeed;
 
-	//Move to target depending on current behavior
-	if (targetPosition.X != 0 && targetPosition.Y != 0) {
-		MoveToLocation(targetPosition);
-		ShowNavigationPath();
-
-		if (AtJumpSegment) m_ReachedTarget = false;
-		else m_ReachedTarget = true;
-	}
+	MoveToLocation(targetPosition);
+	ShowNavigationPath();
+	m_ReachedTarget = targetPosition.X == 0 && targetPosition.Y == 0;
 }
 
 UNavigationPath* ASDTAIController::GetPathToClosestCollectible()
@@ -104,7 +99,7 @@ void ASDTAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollow
 {
 	Super::OnMoveCompleted(RequestID, Result);
 
-	m_ReachedTarget = true;
+	m_ReachedTarget = !AtJumpSegment;
 }
 
 void ASDTAIController::ShowNavigationPath()
@@ -135,7 +130,7 @@ void ASDTAIController::UpdatePlayerInteraction(float deltaTime)
 	//finish jump before updating AI state
 	if (AtJumpSegment)
 		return;
-
+	
 	APawn* selfPawn = GetPawn();
 	if (!selfPawn)
 		return;
@@ -190,6 +185,8 @@ void ASDTAIController::GetHightestPriorityDetectionHit(const TArray<FHitResult>&
 void ASDTAIController::SetPlayerBehavior(FHitResult Hit)
 {
 	if (!SDTUtils::IsPlayerPoweredUp(GetWorld())) {
+		if (isFleeing)
+			m_ReachedTarget = true;
 		isFleeing = false;
 	}
 
@@ -216,7 +213,7 @@ void ASDTAIController::SetPlayerBehavior(FHitResult Hit)
 		if (lastKnownPosition != FVector::ZeroVector) {
 			//Moving towards lastKnownPosition
 			GetPathToActor(lastKnownPosition);
-
+			
 			//if we reached the lastKnownPosition, interrupt the behavior
 			if (FVector::Dist(GetPawn()->GetActorLocation(), lastKnownPosition) < 60) {
 				lastKnownPosition = FVector::ZeroVector;
