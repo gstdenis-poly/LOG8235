@@ -67,27 +67,39 @@ UNavigationPath* ASDTAIController::GetPathToBestFleePoint(FVector actorPosition)
 	TArray<AActor*> fleePoints = TArray<AActor*>();
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASDTFleeLocation::StaticClass(), fleePoints);
 
-	float currentPathLength = 1000000000000.f;
-	UNavigationPath* shortestPath = nullptr;
+	float currentPathLength = 0.f;
+	UNavigationPath* bestPath = nullptr;
 	AActor* closestActor = fleePoints[0];
 
-	//Computing path for each fleePoint and finding the closest one that doesn't intersect the player
+	//Computing path for each fleePoint and finding the farthest from the player that is not closest to the player than the agent
 	for (AActor* fleePoint : fleePoints) {
 		UNavigationSystemV1* navigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
-		UNavigationPath* fleePath = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), fleePoint->GetActorLocation());
-		float pathLength = fleePath->GetPathLength();
+		UNavigationPath* fleePathActor = navigationSystem->FindPathToLocationSynchronously(GetWorld(), actorPosition, fleePoint->GetActorLocation());
+		UNavigationPath* fleePathAgent = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), fleePoint->GetActorLocation());
+		float pathLengthActor = fleePathActor->GetPathLength();
+		float pathLengthAgent = fleePathAgent->GetPathLength();
 
-		FVector distanceToPlayer = actorPosition - fleePoint->GetActorLocation();
-		FVector distanceToAI = GetPawn()->GetActorLocation() - fleePoint->GetActorLocation();
+		//FVector distanceToPlayer = actorPosition - fleePoint->GetActorLocation();
+		//FVector distanceToAI = GetPawn()->GetActorLocation() - fleePoint->GetActorLocation();
+		bool getCloser = false;
+		for (FVector point : fleePathAgent->PathPoints) {
+			UNavigationPath* pathFromPoint = navigationSystem->FindPathToLocationSynchronously(GetWorld(), actorPosition, point);
+			UNavigationPath* pathFromAgent = navigationSystem->FindPathToLocationSynchronously(GetWorld(), actorPosition, GetPawn()->GetActorLocation());
 
-		if (distanceToPlayer.Size() > distanceToAI.Size() && pathLength < currentPathLength) {
-			shortestPath = fleePath;
-			currentPathLength = pathLength;
+			if (pathFromPoint->GetPathLength() < pathFromAgent->GetPathLength()) {
+				getCloser = true;
+				break;
+			}
+		}
+
+		if (pathLengthActor > currentPathLength && !getCloser && pathLengthActor < pathLengthAgent) {
+			bestPath = fleePathAgent;
+			currentPathLength = pathLengthActor;
 			closestActor = fleePoint;
 		}
 	}
 	targetPosition = closestActor->GetActorLocation();
-	return shortestPath;
+	return bestPath;
 }
 
 void ASDTAIController::OnMoveToTarget()
@@ -193,12 +205,13 @@ void ASDTAIController::SetPlayerBehavior(FHitResult Hit)
 	if (Hit.GetComponent()) {
 		// If we detected the player and is visible (raycast)
 		if (Hit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER && !SDTUtils::Raycast(GetWorld(), GetPawn()->GetActorLocation() + FVector(0, 0, 100), Hit.GetActor()->GetActorLocation() + FVector(0, 0, 100))) {
-
+			
 			movementSpeed = runSpeed;
 			// we consider goal reached in order to stop from going to collectible for example
 			m_ReachedTarget = true;
 
 			if (SDTUtils::IsPlayerPoweredUp(GetWorld())) {
+				DrawDebugLine(GetWorld(), GetPawn()->GetActorLocation() + FVector(0, 0, 100), Hit.GetActor()->GetActorLocation() + FVector(0, 0, 100), FColor::Red);
 				//fleeing mode
 				lastKnownPosition = FVector::ZeroVector;
 				GetPathToBestFleePoint(Hit.GetActor()->GetActorLocation());
@@ -206,6 +219,7 @@ void ASDTAIController::SetPlayerBehavior(FHitResult Hit)
 				isFleeing = true;
 			}
 			else {
+				DrawDebugLine(GetWorld(), GetPawn()->GetActorLocation() + FVector(0, 0, 100), Hit.GetActor()->GetActorLocation() + FVector(0, 0, 100), FColor::Green);
 				//updating the lastKnownPosition
 				lastKnownPosition = Hit.GetActor()->GetActorLocation();
 			}
