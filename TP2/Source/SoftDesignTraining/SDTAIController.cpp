@@ -74,13 +74,14 @@ UNavigationPath* ASDTAIController::GetPathToBestFleePoint(FVector actorPosition)
 	//Computing path for each fleePoint and finding the farthest from the player that is not closest to the player than the agent
 	for (AActor* fleePoint : fleePoints) {
 		UNavigationSystemV1* navigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+		// We compute the path for the actor(player) and the agent
 		UNavigationPath* fleePathActor = navigationSystem->FindPathToLocationSynchronously(GetWorld(), actorPosition, fleePoint->GetActorLocation());
 		UNavigationPath* fleePathAgent = navigationSystem->FindPathToLocationSynchronously(GetWorld(), GetPawn()->GetActorLocation(), fleePoint->GetActorLocation());
 		float pathLengthActor = fleePathActor->GetPathLength();
 		float pathLengthAgent = fleePathAgent->GetPathLength();
 
-		//FVector distanceToPlayer = actorPosition - fleePoint->GetActorLocation();
-		//FVector distanceToAI = GetPawn()->GetActorLocation() - fleePoint->GetActorLocation();
+
+		// We check if the path get us closer to the actor
 		bool getCloser = false;
 		for (FVector point : fleePathAgent->PathPoints) {
 			UNavigationPath* pathFromPoint = navigationSystem->FindPathToLocationSynchronously(GetWorld(), actorPosition, point);
@@ -91,7 +92,7 @@ UNavigationPath* ASDTAIController::GetPathToBestFleePoint(FVector actorPosition)
 				break;
 			}
 		}
-
+		// if the path is greater , not getting us close and not closer from the actor than from us, this is the best path
 		if (pathLengthActor > currentPathLength && !getCloser && pathLengthActor < pathLengthAgent) {
 			bestPath = fleePathAgent;
 			currentPathLength = pathLengthActor;
