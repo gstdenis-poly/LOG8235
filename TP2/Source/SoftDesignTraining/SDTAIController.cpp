@@ -191,15 +191,18 @@ void ASDTAIController::SetPlayerBehavior(FHitResult Hit)
 	}
 
 	if (Hit.GetComponent()) {
-		// If we detected the player
-		if (Hit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
+		// If we detected the player and is visible (raycast)
+		if (Hit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER && !SDTUtils::Raycast(GetWorld(), GetPawn()->GetActorLocation() + FVector(0, 0, 100), Hit.GetActor()->GetActorLocation() + FVector(0, 0, 100))) {
 
 			movementSpeed = runSpeed;
+			// we consider goal reached in order to stop from going to collectible for example
+			m_ReachedTarget = true;
 
 			if (SDTUtils::IsPlayerPoweredUp(GetWorld())) {
 				//fleeing mode
 				lastKnownPosition = FVector::ZeroVector;
 				GetPathToBestFleePoint(Hit.GetActor()->GetActorLocation());
+
 				isFleeing = true;
 			}
 			else {
@@ -232,4 +235,16 @@ void ASDTAIController::AIStateInterrupted()
 {
 	StopMovement();
 	m_ReachedTarget = true;
+}
+
+void ASDTAIController::Tick(float deltaTime) {
+
+	// if a collectible just got collected and not inAir, forece path recalculation by setting reached target to true
+	if (needToRelocate && !InAir) {
+		needToRelocate = false;
+		m_ReachedTarget = true;
+	}
+
+	Super::Tick(deltaTime);
+
 }

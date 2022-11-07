@@ -61,6 +61,7 @@ public:
 
 public:
     virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
+    virtual void Tick(float deltaTime) override;
     void AIStateInterrupted();
 
 protected:
