@@ -18,6 +18,11 @@ public:
 
     ASDTBaseAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
     virtual void Tick(float deltaTime) override;
+
+    virtual void BeginPlay() override;
+    UPROPERTY(EditAnywhere, Category = Behavior)
+        class UBehaviorTree* bt;
+
 	
 protected:
     virtual void RotationUpdate(float deltaTime) {};
