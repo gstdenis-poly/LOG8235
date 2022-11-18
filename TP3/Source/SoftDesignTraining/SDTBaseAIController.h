@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
 #include "SDTBaseAIController.generated.h"
 
 /**
@@ -22,7 +25,6 @@ public:
     virtual void BeginPlay() override;
     UPROPERTY(EditAnywhere, Category = Behavior)
         class UBehaviorTree* bt;
-
 	
 protected:
     virtual void RotationUpdate(float deltaTime) {};
