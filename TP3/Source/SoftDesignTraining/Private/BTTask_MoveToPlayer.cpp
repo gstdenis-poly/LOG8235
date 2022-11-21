@@ -14,8 +14,9 @@ EBTNodeResult::Type UBTTask_MoveToPlayer::ExecuteTask(UBehaviorTreeComponent& Ow
 {
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
-        //Implémenter logique pour se déplacer vers le joueur (Chase Mode)
+        //Logique pour se déplacer vers le joueur (Chase Mode)
+        aiController->MoveToPlayer();
         return EBTNodeResult::Succeeded;
     }
-    return EBTNodeResult::Failed;
+    return EBTNodeResult::Succeeded;
 }

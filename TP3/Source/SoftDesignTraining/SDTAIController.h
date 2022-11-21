@@ -46,6 +46,13 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AI)
     bool Landing = false;
 
+    UPROPERTY(EditAnywhere, Category = AI)
+        UBehaviorTree* behaviorTree;
+
+    UBehaviorTreeComponent* m_behaviorTreeComponent;
+
+    UBlackboardComponent* m_blackboardComponent;
+
 protected:
 
     enum PlayerInteractionBehavior
@@ -60,18 +67,19 @@ protected:
     PlayerInteractionBehavior GetCurrentPlayerInteractionBehavior(const FHitResult& hit);
     bool HasLoSOnHit(const FHitResult& hit);
     
-    void MoveToPlayer();
-    void MoveToBestFleeLocation();
     void PlayerInteractionLoSUpdate();
     void OnPlayerInteractionNoLosDone();
     void OnMoveToTarget();
 
 public:
+    virtual void BeginPlay() override;
     virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
     void RotateTowards(const FVector& targetLocation);
     void SetActorLocation(const FVector& targetLocation);
     void AIStateInterrupted();
     void MoveToRandomCollectible();
+    void MoveToPlayer();
+    void MoveToBestFleeLocation();
 
 private:
     virtual void GoToBestTarget(float deltaTime) override;

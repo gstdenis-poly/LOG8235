@@ -27,9 +27,3 @@ void ASDTBaseAIController::Tick(float deltaTime)
         ShowNavigationPath();
     }*/
 }
-
-void ASDTBaseAIController::BeginPlay() {
-    RunBehaviorTree(bt);
-}
-
-

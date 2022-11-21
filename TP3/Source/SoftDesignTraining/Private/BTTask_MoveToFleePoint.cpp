@@ -14,8 +14,9 @@ EBTNodeResult::Type UBTTask_MoveToFleePoint::ExecuteTask(UBehaviorTreeComponent&
 {
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
-        //Implémenter logique pour se déplacer vers un flee point (Flee Mode)
+        //Logique pour se déplacer vers un flee point (Flee Mode)
+        aiController->MoveToBestFleeLocation();
         return EBTNodeResult::Succeeded;
     }
-    return EBTNodeResult::Failed;
+    return EBTNodeResult::Succeeded;
 }

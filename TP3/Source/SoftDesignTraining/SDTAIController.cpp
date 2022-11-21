@@ -15,6 +15,16 @@ ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer.SetDefaultSubobjectClass<USDTPathFollowingComponent>(TEXT("PathFollowingComponent")))
 {
     m_PlayerInteractionBehavior = PlayerInteractionBehavior_Collect;
+    m_behaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));
+    m_blackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
+}
+
+void ASDTAIController::BeginPlay()
+{
+    Super::BeginPlay();
+
+    m_blackboardComponent->InitializeBlackboard(*behaviorTree->BlackboardAsset);
+    m_behaviorTreeComponent->StartTree(*behaviorTree, EBTExecutionMode::SingleRun);
 }
 
 void ASDTAIController::GoToBestTarget(float deltaTime)
@@ -51,6 +61,7 @@ void ASDTAIController::MoveToRandomCollectible()
 
     while (foundCollectibles.Num() != 0)
     {
+        GEngine->AddOnScreenDebugMessage(200, 1.f, FColor::Blue, TEXT("COLLECTIBLES FOUND"));
         int index = FMath::RandRange(0, foundCollectibles.Num() - 1);
 
         ASDTCollectible* collectibleActor = Cast<ASDTCollectible>(foundCollectibles[index]);
@@ -59,6 +70,7 @@ void ASDTAIController::MoveToRandomCollectible()
 
         if (!collectibleActor->IsOnCooldown())
         {
+            GEngine->AddOnScreenDebugMessage(500, 1.f, FColor::Green, TEXT("OK COLLECTIBLE FOUND"));
             MoveToLocation(foundCollectibles[index]->GetActorLocation(), 0.5f, false, true, true, NULL, false);
             OnMoveToTarget();
             return;
@@ -179,6 +191,7 @@ void ASDTAIController::MoveToBestFleeLocation()
 
 void ASDTAIController::OnMoveToTarget()
 {
+    GEngine->AddOnScreenDebugMessage(700, 1.f, FColor::Yellow, TEXT("OnMoveToTarget"));
     m_ReachedTarget = false;
 }
 

@@ -14,6 +14,7 @@ EBTNodeResult::Type UBTTask_MoveToCollectible::ExecuteTask(UBehaviorTreeComponen
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
         //Logique pour se déplacer vers un collectible
+        aiController->MoveToRandomCollectible();
         return EBTNodeResult::Succeeded;
     }
     return EBTNodeResult::Failed;
