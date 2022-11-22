@@ -13,5 +13,4 @@ UCLASS()
 class SOFTDESIGNTRAINING_API UBTDecorator_TryDetectPlayer : public UBTDecorator_BlackboardBase
 {
 	GENERATED_BODY()
-	
 };

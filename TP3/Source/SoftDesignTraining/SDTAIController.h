@@ -50,8 +50,9 @@ public:
         UBehaviorTree* behaviorTree;
 
     UBehaviorTreeComponent* m_behaviorTreeComponent;
-
     UBlackboardComponent* m_blackboardComponent;
+
+    uint8 GetPlayerSeenKeyID() const { return m_isPlayerSeenBBKeyID; }
 
 protected:
 
@@ -80,11 +81,14 @@ public:
     void MoveToRandomCollectible();
     void MoveToPlayer();
     void MoveToBestFleeLocation();
+    bool TryDetectPlayer();
 
 private:
     virtual void GoToBestTarget(float deltaTime) override;
     virtual void UpdatePlayerInteraction(float deltaTime) override;
     virtual void ShowNavigationPath() override;
+
+    uint8   m_isPlayerSeenBBKeyID;
 
 protected:
     FVector m_JumpTarget;

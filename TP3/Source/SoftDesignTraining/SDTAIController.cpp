@@ -61,7 +61,7 @@ void ASDTAIController::MoveToRandomCollectible()
 
     while (foundCollectibles.Num() != 0)
     {
-        GEngine->AddOnScreenDebugMessage(200, 1.f, FColor::Blue, TEXT("COLLECTIBLES FOUND"));
+        //GEngine->AddOnScreenDebugMessage(200, 1.f, FColor::Blue, TEXT("COLLECTIBLES FOUND"));
         int index = FMath::RandRange(0, foundCollectibles.Num() - 1);
 
         ASDTCollectible* collectibleActor = Cast<ASDTCollectible>(foundCollectibles[index]);
@@ -70,7 +70,7 @@ void ASDTAIController::MoveToRandomCollectible()
 
         if (!collectibleActor->IsOnCooldown())
         {
-            GEngine->AddOnScreenDebugMessage(500, 1.f, FColor::Green, TEXT("OK COLLECTIBLE FOUND"));
+            //GEngine->AddOnScreenDebugMessage(500, 1.f, FColor::Green, TEXT("OK COLLECTIBLE FOUND"));
             MoveToLocation(foundCollectibles[index]->GetActorLocation(), 0.5f, false, true, true, NULL, false);
             OnMoveToTarget();
             return;
@@ -191,7 +191,7 @@ void ASDTAIController::MoveToBestFleeLocation()
 
 void ASDTAIController::OnMoveToTarget()
 {
-    GEngine->AddOnScreenDebugMessage(700, 1.f, FColor::Yellow, TEXT("OnMoveToTarget"));
+    //GEngine->AddOnScreenDebugMessage(700, 1.f, FColor::Yellow, TEXT("OnMoveToTarget"));
     m_ReachedTarget = false;
 }
 
@@ -373,4 +373,32 @@ void ASDTAIController::UpdatePlayerInteractionBehavior(const FHitResult& detecti
         m_PlayerInteractionBehavior = currentBehavior;
         AIStateInterrupted();
     }
+}
+
+bool ASDTAIController::TryDetectPlayer()
+{
+    if (AtJumpSegment)
+        return false;
+
+    APawn* selfPawn = GetPawn();
+    if (!selfPawn)
+        return false;
+
+    ACharacter* playerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+    if (!playerCharacter)
+        return false;
+
+    FVector detectionStartLocation = selfPawn->GetActorLocation() + selfPawn->GetActorForwardVector() * m_DetectionCapsuleForwardStartingOffset;
+    FVector detectionEndLocation = detectionStartLocation + selfPawn->GetActorForwardVector() * m_DetectionCapsuleHalfLength * 2;
+
+    TArray<TEnumAsByte<EObjectTypeQuery>> detectionTraceObjectTypes;
+    detectionTraceObjectTypes.Add(UEngineTypes::ConvertToObjectType(COLLISION_PLAYER));
+
+    TArray<FHitResult> allDetectionHits;
+    GetWorld()->SweepMultiByObjectType(allDetectionHits, detectionStartLocation, detectionEndLocation, FQuat::Identity, detectionTraceObjectTypes, FCollisionShape::MakeSphere(m_DetectionCapsuleRadius));
+
+    FHitResult detectionHit;
+    GetHightestPriorityDetectionHit(allDetectionHits, detectionHit);
+
+    return detectionHit.GetComponent() && detectionHit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER;
 }
