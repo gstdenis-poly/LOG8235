@@ -53,6 +53,7 @@ public:
     UBlackboardComponent* m_blackboardComponent;
 
     uint8 GetPlayerSeenKeyID() const { return m_isPlayerSeenBBKeyID; }
+    bool GetReachedTarget() const { return m_ReachedTarget; }
 
 protected:
 

@@ -17,7 +17,6 @@ EBTNodeResult::Type UBTTask_IsPlayerDetected::ExecuteTask(UBehaviorTreeComponent
         if (OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Bool>(aiController->GetPlayerSeenKeyID())) {
             return EBTNodeResult::Succeeded;
         }
-        return EBTNodeResult::Failed;
     }
     return EBTNodeResult::Failed;
 }
