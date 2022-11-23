@@ -14,7 +14,10 @@ EBTNodeResult::Type UBTTask_IsPlayerDetected::ExecuteTask(UBehaviorTreeComponent
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
         //Logique pour récupérer l'état de détection
-        return EBTNodeResult::Succeeded;
+        if (OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Bool>(aiController->GetPlayerSeenKeyID())) {
+            return EBTNodeResult::Succeeded;
+        }
+        return EBTNodeResult::Failed;
     }
     return EBTNodeResult::Failed;
 }
