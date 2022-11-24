@@ -7,6 +7,7 @@
 #include "SDTPathFollowingComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 //#include "UnrealMathUtility.h"
 #include "SDTUtils.h"
 #include "EngineUtils.h"
@@ -24,7 +25,9 @@ void ASDTAIController::BeginPlay()
     Super::BeginPlay();
 
     m_blackboardComponent->InitializeBlackboard(*behaviorTree->BlackboardAsset);
-    m_behaviorTreeComponent->StartTree(*behaviorTree, EBTExecutionMode::SingleRun);
+    m_isPlayerSeenBBKeyID = m_blackboardComponent->GetKeyID("IsPlayerDetected");
+    m_blackboardComponent->SetValue<UBlackboardKeyType_Object>(m_blackboardComponent->GetKeyID("SelfActor"), GetPawn());
+    m_behaviorTreeComponent->StartTree(*behaviorTree/*, EBTExecutionMode::SingleRun*/);
 }
 
 void ASDTAIController::GoToBestTarget(float deltaTime)
