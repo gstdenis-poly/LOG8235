@@ -5,6 +5,7 @@
 #include "SDTCollectible.h"
 #include "SDTFleeLocation.h"
 #include "SDTPathFollowingComponent.h"
+#include "AiAgentGroupManager.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
@@ -18,8 +19,6 @@ ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
     m_PlayerInteractionBehavior = PlayerInteractionBehavior_Collect;
     m_behaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));
     m_blackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
-
-    //m_AiGroupManager = AiGroupManager::GetInstance();
 }
 
 void ASDTAIController::BeginPlay()
@@ -91,7 +90,9 @@ void ASDTAIController::MoveToPlayer()
     if (!playerCharacter)
         return;
 
-    //m_AiGroupManager->RegisterAIAgent(this);
+    AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
+    m_AiAgentGroupManager->RegisterAIAgent(this);
+
     MoveToActor(playerCharacter, 0.5f, false, true, true, NULL, false);
     OnMoveToTarget();
 }
