@@ -18,6 +18,8 @@ ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
     m_PlayerInteractionBehavior = PlayerInteractionBehavior_Collect;
     m_behaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));
     m_blackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
+
+    //m_AiGroupManager = AiGroupManager::GetInstance();
 }
 
 void ASDTAIController::BeginPlay()
@@ -89,6 +91,7 @@ void ASDTAIController::MoveToPlayer()
     if (!playerCharacter)
         return;
 
+    //m_AiGroupManager->RegisterAIAgent(this);
     MoveToActor(playerCharacter, 0.5f, false, true, true, NULL, false);
     OnMoveToTarget();
 }
