@@ -57,6 +57,9 @@ void ASDTAIController::GoToBestTarget(float deltaTime)
 
 void ASDTAIController::MoveToRandomCollectible()
 {
+    AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
+    m_AiAgentGroupManager->UnregisterAIAgent(this);
+
     float closestSqrCollectibleDistance = 18446744073709551610.f;
     ASDTCollectible* closestCollectible = nullptr;
 
@@ -93,7 +96,8 @@ void ASDTAIController::MoveToPlayer()
     AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
     m_AiAgentGroupManager->RegisterAIAgent(this);
 
-    MoveToActor(playerCharacter, 0.5f, false, true, true, NULL, false);
+    //MoveToActor(playerCharacter, 0.5f, false, true, true, NULL, false);
+    MoveToLocation(m_attackPoint, 0.5f, false, true, true, NULL, false);
     OnMoveToTarget();
 }
 
@@ -154,6 +158,9 @@ void ASDTAIController::OnPlayerInteractionNoLosDone()
 
 void ASDTAIController::MoveToBestFleeLocation()
 {
+    AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
+    m_AiAgentGroupManager->UnregisterAIAgent(this);
+
     float bestLocationScore = 0.f;
     ASDTFleeLocation* bestFleeLocation = nullptr;
 

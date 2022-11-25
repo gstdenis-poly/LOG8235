@@ -14,7 +14,8 @@ public:
     void RegisterAIAgent(ASDTAIController* aiAgent);
     void UnregisterAIAgent(ASDTAIController* aiAgent);
     void DrawSphereOverGroupMembers();
-    void SetChasingPointsAroundTarget();
+    void GetChasingPointsAroundTarget();
+    void AssignChasingPointsToAIs();
 
 private:
 
@@ -24,4 +25,6 @@ private:
     TArray<ASDTAIController*> m_registeredAgents;
     FVector m_memberIdentifierLocation = FVector(0.f, 0.f, 100.f);
     FVector m_lastKnownPosition;
+    TArray<FVector> m_attackPoints;
+    float m_rayon = 100.f;
 };

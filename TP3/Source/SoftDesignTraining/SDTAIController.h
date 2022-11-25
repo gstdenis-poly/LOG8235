@@ -54,6 +54,7 @@ public:
 
     uint8 GetPlayerSeenKeyID() const { return m_isPlayerSeenBBKeyID; }
     bool GetReachedTarget() const { return m_ReachedTarget; }
+    FVector m_attackPoint;
 
 protected:
 
