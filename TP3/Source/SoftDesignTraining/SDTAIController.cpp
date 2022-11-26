@@ -411,5 +411,10 @@ bool ASDTAIController::TryDetectPlayer()
     FHitResult detectionHit;
     GetHightestPriorityDetectionHit(allDetectionHits, detectionHit);
 
-    return detectionHit.GetComponent() && detectionHit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER;
+    if (detectionHit.GetComponent() && detectionHit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
+        AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
+        m_AiAgentGroupManager->SetLastKnownPosition(detectionHit.GetActor()->GetActorLocation());
+        return true;
+    }
+    else return false;
 }

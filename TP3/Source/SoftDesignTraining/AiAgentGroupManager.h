@@ -13,9 +13,10 @@ public:
 
     void RegisterAIAgent(ASDTAIController* aiAgent);
     void UnregisterAIAgent(ASDTAIController* aiAgent);
-    void DrawSphereOverGroupMembers();
+    void DrawSphereOverGroupMembers(float deltaTime);
     void GetChasingPointsAroundTarget();
     void AssignChasingPointsToAIs();
+    void SetLastKnownPosition(FVector lkp) { m_lastKnownPosition = lkp; }
 
 private:
 
@@ -26,5 +27,6 @@ private:
     FVector m_memberIdentifierLocation = FVector(0.f, 0.f, 100.f);
     FVector m_lastKnownPosition;
     TArray<FVector> m_attackPoints;
+    TArray<FVector> m_assignedAttackPoints;
     float m_rayon = 100.f;
 };

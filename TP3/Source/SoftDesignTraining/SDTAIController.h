@@ -54,7 +54,7 @@ public:
 
     uint8 GetPlayerSeenKeyID() const { return m_isPlayerSeenBBKeyID; }
     bool GetReachedTarget() const { return m_ReachedTarget; }
-    FVector m_attackPoint;
+    void SetAttackPoint(FVector attackPoint) { m_attackPoint = attackPoint; }
 
 protected:
 
@@ -91,6 +91,7 @@ private:
     virtual void ShowNavigationPath() override;
 
     uint8   m_isPlayerSeenBBKeyID;
+    FVector m_attackPoint;
 
 protected:
     FVector m_JumpTarget;
