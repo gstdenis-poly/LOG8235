@@ -6,6 +6,7 @@
 #include "SDTFleeLocation.h"
 #include "SDTPathFollowingComponent.h"
 #include "AiAgentGroupManager.h"
+#include "AiUpdateTimeSlicer.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
@@ -57,6 +58,10 @@ void ASDTAIController::GoToBestTarget(float deltaTime)
 
 void ASDTAIController::MoveToRandomCollectible()
 {
+    AiUpdateTimeSlicer * timeSlicer = AiUpdateTimeSlicer::GetInstance();
+    //if (timeSlicer->GetBalance() <= 0)
+    //    return;
+
     //Profiling temps CPU
     double startTime = FPlatformTime::Seconds();
 
@@ -81,6 +86,10 @@ void ASDTAIController::MoveToRandomCollectible()
         {
             double deltaTime = FPlatformTime::Seconds() - startTime;
             DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Collect: " + FString::SanitizeFloat(FMath::RoundToFloat(deltaTime * 1000000)) + " ms", GetPawn(), FColor::Blue, 1.0f, false);
+            
+            timeSlicer->Consume(deltaTime);
+            GEngine->AddOnScreenDebugMessage(98, 5.f, FColor::Blue, FString::SanitizeFloat(deltaTime));
+
             MoveToLocation(foundCollectibles[index]->GetActorLocation(), 0.5f, false, true, true, NULL, false);
             OnMoveToTarget();
             return;
@@ -146,7 +155,6 @@ void ASDTAIController::PlayerInteractionLoSUpdate()
             DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Lost LoS", GetPawn(), FColor::Red, 5.f, false);
         }
     }
-    
 }
 
 void ASDTAIController::OnPlayerInteractionNoLosDone()
@@ -163,6 +171,10 @@ void ASDTAIController::OnPlayerInteractionNoLosDone()
 
 void ASDTAIController::MoveToBestFleeLocation()
 {
+    AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
+    //if (timeSlicer->GetBalance() <= 0)
+    //    return;
+
     double startTime = FPlatformTime::Seconds();
     AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
     m_AiAgentGroupManager->UnregisterAIAgent(this);
@@ -204,6 +216,9 @@ void ASDTAIController::MoveToBestFleeLocation()
     {
         double deltaTime = FPlatformTime::Seconds() - startTime;
         DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Flee: " + FString::SanitizeFloat(FMath::RoundToFloat(deltaTime * 1000000)) + " ms", GetPawn(), FColor::Red, 1.0f, false);
+
+        timeSlicer->Consume(deltaTime);
+
         MoveToLocation(bestFleeLocation->GetActorLocation(), 0.5f, false, true, false, NULL, false);
         OnMoveToTarget();
     }
@@ -396,6 +411,10 @@ void ASDTAIController::UpdatePlayerInteractionBehavior(const FHitResult& detecti
 
 bool ASDTAIController::TryDetectPlayer()
 {
+    AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
+    //if (timeSlicer->GetBalance() <= 0)
+    //    return false;
+
     double startTime = FPlatformTime::Seconds();
 
     if (AtJumpSegment)
@@ -423,6 +442,8 @@ bool ASDTAIController::TryDetectPlayer()
 
     double deltaTime = FPlatformTime::Seconds() - startTime;
     DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Detect: " + FString::SanitizeFloat(FMath::RoundToFloat(deltaTime * 1000000)) + " ms", GetPawn(), FColor::Yellow, 1.0f, false);
+
+    timeSlicer->Consume(deltaTime);
 
     if (detectionHit.GetComponent() && detectionHit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
         AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();

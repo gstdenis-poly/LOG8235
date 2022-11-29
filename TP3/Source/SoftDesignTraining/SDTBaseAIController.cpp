@@ -3,6 +3,7 @@
 #include "SDTBaseAIController.h"
 #include "SoftDesignTraining.h"
 #include "AiAgentGroupManager.h"
+#include "AiUpdateTimeSlicer.h"
 
 ASDTBaseAIController::ASDTBaseAIController(const FObjectInitializer& ObjectInitializer)
     :Super(ObjectInitializer)
@@ -14,12 +15,13 @@ ASDTBaseAIController::ASDTBaseAIController(const FObjectInitializer& ObjectIniti
 
 void ASDTBaseAIController::Tick(float deltaTime)
 {
-
     Super::Tick(deltaTime);
-
 
     AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
     m_AiAgentGroupManager->DrawSphereOverGroupMembers(deltaTime);
+
+    AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
+    GEngine->AddOnScreenDebugMessage(99, 5.f, FColor::Blue, FString::SanitizeFloat(timeSlicer->GetBalance()));
 
     /*UpdatePlayerInteraction(deltaTime);
 
