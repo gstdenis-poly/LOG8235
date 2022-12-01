@@ -24,12 +24,12 @@ void AiUpdateTimeSlicer::Destroy()
     m_Instance = nullptr;
 }
 
-void AiUpdateTimeSlicer::Consume(double amount)
+void AiUpdateTimeSlicer::Consume(int amount)
 {
     m_Balance -= amount;
 }
 
-double AiUpdateTimeSlicer::GetBalance()
+int AiUpdateTimeSlicer::GetBalance()
 {
     return m_Balance;
 }

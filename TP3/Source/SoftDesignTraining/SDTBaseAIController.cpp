@@ -20,10 +20,6 @@ void ASDTBaseAIController::Tick(float deltaTime)
     AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
     m_AiAgentGroupManager->DrawSphereOverGroupMembers(deltaTime);
 
-    AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::SanitizeFloat(timeSlicer->GetBalance()));
-    timeSlicer->Reset();
-
     /*UpdatePlayerInteraction(deltaTime);
 
     if (m_ReachedTarget)

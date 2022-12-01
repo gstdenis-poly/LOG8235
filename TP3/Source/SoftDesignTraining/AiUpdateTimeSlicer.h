@@ -2,19 +2,21 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
+
 class AiUpdateTimeSlicer
 {
 public:
     static AiUpdateTimeSlicer* GetInstance();
     static void Destroy();
-    void Consume(double amount);
-    double GetBalance();
+    void Consume(int amount);
+    int GetBalance();
     void Reset();
 
 private:
     AiUpdateTimeSlicer();
     static AiUpdateTimeSlicer* m_Instance;
 
-    double m_Budget = 1.f;
-    double m_Balance = m_Budget;
+    int m_Budget = 30;
+    int m_Balance = m_Budget;
 };
