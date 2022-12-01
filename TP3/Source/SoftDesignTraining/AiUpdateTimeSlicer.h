@@ -15,6 +15,6 @@ private:
     AiUpdateTimeSlicer();
     static AiUpdateTimeSlicer* m_Instance;
 
-    double m_Budget = 1.0;
+    double m_Budget = 1.f;
     double m_Balance = m_Budget;
 };

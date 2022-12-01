@@ -27,7 +27,6 @@ void AiUpdateTimeSlicer::Destroy()
 void AiUpdateTimeSlicer::Consume(double amount)
 {
     m_Balance -= amount;
-    GEngine->AddOnScreenDebugMessage(97, 5.f, FColor::Blue, FString::SanitizeFloat(m_Budget));
 }
 
 double AiUpdateTimeSlicer::GetBalance()
