@@ -37,4 +37,20 @@ int AiUpdateTimeSlicer::GetBalance()
 void AiUpdateTimeSlicer::Reset()
 {
     m_Balance = m_Budget;
+    m_Counter = 0;
+}
+
+int AiUpdateTimeSlicer::GetThreshold()
+{
+    return m_Threshold;
+}
+
+void AiUpdateTimeSlicer::Increment()
+{
+    m_Counter++;
+}
+
+int AiUpdateTimeSlicer::GetCounter()
+{
+    return m_Counter;
 }

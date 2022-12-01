@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
 class AiUpdateTimeSlicer
 {
 public:
@@ -12,11 +10,16 @@ public:
     void Consume(int amount);
     int GetBalance();
     void Reset();
+    int GetThreshold();
+    void Increment();
+    int GetCounter();
 
 private:
     AiUpdateTimeSlicer();
     static AiUpdateTimeSlicer* m_Instance;
 
-    int m_Budget = 30;
+    int m_Budget = 10; // Budget of updates per frame
     int m_Balance = m_Budget;
+    int m_Threshold = 56; // Number of AI controllers
+    int m_Counter = 0;
 };

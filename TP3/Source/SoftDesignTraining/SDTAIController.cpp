@@ -59,13 +59,11 @@ void ASDTAIController::GoToBestTarget(float deltaTime)
 void ASDTAIController::MoveToRandomCollectible()
 {
     AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
-    if (timeSlicer->GetBalance() <= 30)
+    timeSlicer->Increment();
+    if (timeSlicer->GetCounter() == timeSlicer->GetThreshold())
         timeSlicer->Reset();
-    else if (timeSlicer->GetBalance() <= 0)
-    {
-        timeSlicer->Consume(1);
+    else if (timeSlicer->GetBalance() == 0)
         return;
-    }
 
     //Profiling temps CPU
     double startTime = FPlatformTime::Seconds();
@@ -176,13 +174,11 @@ void ASDTAIController::OnPlayerInteractionNoLosDone()
 void ASDTAIController::MoveToBestFleeLocation()
 {
     AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
-    if (timeSlicer->GetBalance() <= 30)
+    timeSlicer->Increment();
+    if (timeSlicer->GetCounter() == timeSlicer->GetThreshold())
         timeSlicer->Reset();
-    else if (timeSlicer->GetBalance() <= 0)
-    {
-        timeSlicer->Consume(1);
+    else if (timeSlicer->GetBalance() == 0)
         return;
-    }
 
     double startTime = FPlatformTime::Seconds();
     AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
@@ -421,13 +417,11 @@ void ASDTAIController::UpdatePlayerInteractionBehavior(const FHitResult& detecti
 bool ASDTAIController::TryDetectPlayer()
 {
     AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
-    if (timeSlicer->GetBalance() <= 30)
+    timeSlicer->Increment();
+    if (timeSlicer->GetCounter() == timeSlicer->GetThreshold())
         timeSlicer->Reset();
-    else if (timeSlicer->GetBalance() <= 0)
-    {
-        timeSlicer->Consume(1);
+    else if (timeSlicer->GetBalance() == 0)
         return false;
-    }
 
     double startTime = FPlatformTime::Seconds();
 

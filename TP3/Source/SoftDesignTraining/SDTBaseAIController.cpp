@@ -3,7 +3,6 @@
 #include "SDTBaseAIController.h"
 #include "SoftDesignTraining.h"
 #include "AiAgentGroupManager.h"
-#include "AiUpdateTimeSlicer.h"
 
 ASDTBaseAIController::ASDTBaseAIController(const FObjectInitializer& ObjectInitializer)
     :Super(ObjectInitializer)
