@@ -23,8 +23,9 @@ void AiAgentGroupManager::Destroy()
 {
     delete m_Instance;
     m_Instance = nullptr;
-}
+} 
 
+//Méthode pour ajouter un agent au groupe de poursuite
 void AiAgentGroupManager::RegisterAIAgent(ASDTAIController* aiAgent)
 {
     if (m_registeredAgents.AddUnique(aiAgent) != -1) {
@@ -33,6 +34,7 @@ void AiAgentGroupManager::RegisterAIAgent(ASDTAIController* aiAgent)
     }
 }
 
+//Méthode pour enlever un agent au groupe de poursuite
 void AiAgentGroupManager::UnregisterAIAgent(ASDTAIController* aiAgent)
 {
     if (m_registeredAgents.Remove(aiAgent) != 0) {
@@ -41,6 +43,7 @@ void AiAgentGroupManager::UnregisterAIAgent(ASDTAIController* aiAgent)
     }
 }
 
+//Méthode pour afficher un indicateur sur les agents membres du groupe
 void AiAgentGroupManager::DrawSphereOverGroupMembers()
 {
     for (int i = 0; i < m_registeredAgents.Num(); i++)
@@ -53,6 +56,7 @@ void AiAgentGroupManager::DrawSphereOverGroupMembers()
     }
 }
 
+//Méthode pour calculer les points d'attaques pour entourer le joueur
 void AiAgentGroupManager::GetChasingPointsAroundTarget()
 {
     if (m_registeredAgents.Num() == 0) return;
@@ -75,6 +79,7 @@ void AiAgentGroupManager::GetChasingPointsAroundTarget()
     AssignChasingPointsToAIs();
 }
 
+//Méthode pour assigner logiquement chacun des points d'attaque à un des agents membres du groupe
 void AiAgentGroupManager::AssignChasingPointsToAIs()
 {
     m_assignedAttackPoints.Empty();

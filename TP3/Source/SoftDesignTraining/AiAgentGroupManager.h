@@ -21,12 +21,12 @@ public:
 private:
 
     AiAgentGroupManager();
-    static AiAgentGroupManager* m_Instance;
+    static AiAgentGroupManager* m_Instance; // Instance singleton
 
-    TArray<ASDTAIController*> m_registeredAgents;
-    FVector m_memberIdentifierLocation = FVector(0.f, 0.f, 100.f);
-    FVector m_lastKnownPosition;
-    TArray<FVector> m_attackPoints;
-    TArray<FVector> m_assignedAttackPoints;
-    float m_rayon = 100.f;
+    TArray<ASDTAIController*> m_registeredAgents; // Liste des AIs membres du groupe
+    FVector m_memberIdentifierLocation = FVector(0.f, 0.f, 100.f); // Pour afficher l'indicateur au dessus de la tête des agents
+    FVector m_lastKnownPosition; // La dernière position vue par le groupe
+    TArray<FVector> m_attackPoints; // Liste des points d'attaques
+    TArray<FVector> m_assignedAttackPoints; // Pour l'assignation logique des points d'attaques au joueur
+    float m_rayon = 100.f; // Rayon autour du joueur pour l'encercler
 };

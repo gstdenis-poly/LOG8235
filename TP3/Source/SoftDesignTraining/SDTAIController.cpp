@@ -26,6 +26,7 @@ void ASDTAIController::BeginPlay()
 {
     Super::BeginPlay();
 
+    //Initialisation du behaviorTree et du blackboard
     m_blackboardComponent->InitializeBlackboard(*behaviorTree->BlackboardAsset);
     m_isPlayerSeenBBKeyID = m_blackboardComponent->GetKeyID("IsPlayerDetected");
     m_blackboardComponent->SetValue<UBlackboardKeyType_Object>(m_blackboardComponent->GetKeyID("SelfActor"), GetPawn());
@@ -89,6 +90,7 @@ void ASDTAIController::MoveToRandomCollectible()
         {
             double deltaTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles()) - startTime;
             DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Collect: " + FString::SanitizeFloat(deltaTime) + " ms", GetPawn(), FColor::Blue, .5f, false);
+
             timeSlicer->Consume(deltaTime);
 
             MoveToLocation(foundCollectibles[index]->GetActorLocation(), 0.5f, false, true, true, NULL, false);

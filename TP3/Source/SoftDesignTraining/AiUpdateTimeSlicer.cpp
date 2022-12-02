@@ -24,6 +24,7 @@ void AiUpdateTimeSlicer::Destroy()
     m_Instance = nullptr;
 }
 
+// Méthode pour consommer le temps CPU du budget
 void AiUpdateTimeSlicer::Consume(float amount)
 {
     m_Balance -= amount;
@@ -34,6 +35,7 @@ int AiUpdateTimeSlicer::GetBalance()
     return m_Balance;
 }
 
+// Méthode pour réinitialiser le budget à chaque frame
 void AiUpdateTimeSlicer::Reset()
 {
     m_Balance = m_Budget;
@@ -45,6 +47,7 @@ int AiUpdateTimeSlicer::GetAICount()
     return m_AICount;
 }
 
+// Initialisation du nombre de AIs sur la map
 void AiUpdateTimeSlicer::IncrementAICount(FString aiLabel)
 {
     m_AICount++;
@@ -61,6 +64,7 @@ int AiUpdateTimeSlicer::GetExecutedAIs()
     return m_ExecutedAIs;
 }
 
+// Méthode pour savoir si les agents peuvent exécuter leur update dans la frame en cours
 bool AiUpdateTimeSlicer::CanExecute(FString aiLabel)
 {
     if (GetExecutedAIs() == GetAICount()) 
