@@ -13,7 +13,7 @@ public:
 
     void RegisterAIAgent(ASDTAIController* aiAgent);
     void UnregisterAIAgent(ASDTAIController* aiAgent);
-    void DrawSphereOverGroupMembers(float deltaTime);
+    void DrawSphereOverGroupMembers();
     void GetChasingPointsAroundTarget();
     void AssignChasingPointsToAIs();
     void SetLastKnownPosition(FVector lkp) { m_lastKnownPosition = lkp; }

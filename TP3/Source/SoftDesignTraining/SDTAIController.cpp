@@ -30,6 +30,10 @@ void ASDTAIController::BeginPlay()
     m_isPlayerSeenBBKeyID = m_blackboardComponent->GetKeyID("IsPlayerDetected");
     m_blackboardComponent->SetValue<UBlackboardKeyType_Object>(m_blackboardComponent->GetKeyID("SelfActor"), GetPawn());
     m_behaviorTreeComponent->StartTree(*behaviorTree/*, EBTExecutionMode::SingleRun*/);
+    
+    //Compte le nombre de AIs actifs dans le niveau
+    AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
+    timeSlicer->IncrementAICount(); 
 }
 
 void ASDTAIController::GoToBestTarget(float deltaTime)
@@ -59,14 +63,10 @@ void ASDTAIController::GoToBestTarget(float deltaTime)
 void ASDTAIController::MoveToRandomCollectible()
 {
     AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
-    timeSlicer->Increment();
-    if (timeSlicer->GetCounter() == timeSlicer->GetThreshold())
-        timeSlicer->Reset();
-    else if (timeSlicer->GetBalance() == 0)
-        return;
+    if (!timeSlicer->CanExecute()) return;
 
     //Profiling temps CPU
-    double startTime = FPlatformTime::Seconds();
+    double startTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles());
 
     AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
     m_AiAgentGroupManager->UnregisterAIAgent(this);
@@ -87,10 +87,10 @@ void ASDTAIController::MoveToRandomCollectible()
 
         if (!collectibleActor->IsOnCooldown())
         {
-            double deltaTime = FPlatformTime::Seconds() - startTime;
-            DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Collect: " + FString::SanitizeFloat(FMath::RoundToFloat(deltaTime * 1000000)) + " ms", GetPawn(), FColor::Blue, 1.0f, false);
+            double deltaTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles()) - startTime;
+            DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Collect: " + FString::SanitizeFloat(FMath::RoundToFloat(deltaTime)) + " ms", GetPawn(), FColor::Blue, 1.0f, false);
             
-            timeSlicer->Consume(1);
+            timeSlicer->Consume(deltaTime);
 
             MoveToLocation(foundCollectibles[index]->GetActorLocation(), 0.5f, false, true, true, NULL, false);
             OnMoveToTarget();
@@ -112,7 +112,6 @@ void ASDTAIController::MoveToPlayer()
     AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
     m_AiAgentGroupManager->RegisterAIAgent(this);
 
-    //MoveToActor(playerCharacter, 0.5f, false, true, true, NULL, false);
     MoveToLocation(m_attackPoint, 0.5f, false, true, true, NULL, false);
     OnMoveToTarget();
 }
@@ -174,13 +173,9 @@ void ASDTAIController::OnPlayerInteractionNoLosDone()
 void ASDTAIController::MoveToBestFleeLocation()
 {
     AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
-    timeSlicer->Increment();
-    if (timeSlicer->GetCounter() == timeSlicer->GetThreshold())
-        timeSlicer->Reset();
-    else if (timeSlicer->GetBalance() == 0)
-        return;
+    if (!timeSlicer->CanExecute()) return;
 
-    double startTime = FPlatformTime::Seconds();
+    double startTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles());
     AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
     m_AiAgentGroupManager->UnregisterAIAgent(this);
 
@@ -219,10 +214,10 @@ void ASDTAIController::MoveToBestFleeLocation()
 
     if (bestFleeLocation)
     {
-        double deltaTime = FPlatformTime::Seconds() - startTime;
-        DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Flee: " + FString::SanitizeFloat(FMath::RoundToFloat(deltaTime * 1000000)) + " ms", GetPawn(), FColor::Red, 1.0f, false);
+        double deltaTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles()) - startTime;
+        DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Flee: " + FString::SanitizeFloat(FMath::RoundToFloat(deltaTime)) + " ms", GetPawn(), FColor::Red, 1.0f, false);
 
-        timeSlicer->Consume(1);
+        timeSlicer->Consume(deltaTime);
 
         MoveToLocation(bestFleeLocation->GetActorLocation(), 0.5f, false, true, false, NULL, false);
         OnMoveToTarget();
@@ -417,13 +412,9 @@ void ASDTAIController::UpdatePlayerInteractionBehavior(const FHitResult& detecti
 bool ASDTAIController::TryDetectPlayer()
 {
     AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
-    timeSlicer->Increment();
-    if (timeSlicer->GetCounter() == timeSlicer->GetThreshold())
-        timeSlicer->Reset();
-    else if (timeSlicer->GetBalance() == 0)
-        return false;
+    if (!timeSlicer->CanExecute()) return false;
 
-    double startTime = FPlatformTime::Seconds();
+    double startTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles());
 
     if (AtJumpSegment)
         return false;
@@ -448,14 +439,15 @@ bool ASDTAIController::TryDetectPlayer()
     FHitResult detectionHit;
     GetHightestPriorityDetectionHit(allDetectionHits, detectionHit);
 
-    double deltaTime = FPlatformTime::Seconds() - startTime;
-    DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Detect: " + FString::SanitizeFloat(FMath::RoundToFloat(deltaTime * 1000000)) + " ms", GetPawn(), FColor::Yellow, 1.0f, false);
+    double deltaTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles()) - startTime;
+    DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Detect: " + FString::SanitizeFloat(FMath::RoundToFloat(deltaTime)) + " ms", GetPawn(), FColor::Yellow, 1.0f, false);
 
-    timeSlicer->Consume(1);
+    timeSlicer->Consume(deltaTime);
 
     if (detectionHit.GetComponent() && detectionHit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
         AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
         m_AiAgentGroupManager->SetLastKnownPosition(detectionHit.GetActor()->GetActorLocation());
+        m_AiAgentGroupManager->RegisterAIAgent(this);
         return true;
     }
     else return false;

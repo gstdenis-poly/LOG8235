@@ -27,24 +27,28 @@ void AiAgentGroupManager::Destroy()
 
 void AiAgentGroupManager::RegisterAIAgent(ASDTAIController* aiAgent)
 {
-    m_registeredAgents.AddUnique(aiAgent);
-    GetChasingPointsAroundTarget();
+    if (m_registeredAgents.AddUnique(aiAgent) != -1) {
+        DrawSphereOverGroupMembers();
+        GetChasingPointsAroundTarget();
+    }
 }
 
 void AiAgentGroupManager::UnregisterAIAgent(ASDTAIController* aiAgent)
 {
-    m_registeredAgents.Remove(aiAgent);
-    GetChasingPointsAroundTarget();
+    if (m_registeredAgents.Remove(aiAgent) != 0) {
+        DrawSphereOverGroupMembers();
+        GetChasingPointsAroundTarget();
+    }
 }
 
-void AiAgentGroupManager::DrawSphereOverGroupMembers(float deltaTime)
+void AiAgentGroupManager::DrawSphereOverGroupMembers()
 {
     for (int i = 0; i < m_registeredAgents.Num(); i++)
     {
         if (ASDTAIController* aicontroller = m_registeredAgents[i])
         {
             FVector actorLocation = aicontroller->GetPawn()->GetActorLocation();
-            DrawDebugSphere(aicontroller->GetWorld(), actorLocation + m_memberIdentifierLocation, deltaTime, 32, FColor::Red);
+            DrawDebugSphere(aicontroller->GetWorld(), actorLocation + m_memberIdentifierLocation, 10.f, 32, FColor::Red, false);
         }
     }
 }

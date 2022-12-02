@@ -2,7 +2,6 @@
 
 #include "SDTBaseAIController.h"
 #include "SoftDesignTraining.h"
-#include "AiAgentGroupManager.h"
 
 ASDTBaseAIController::ASDTBaseAIController(const FObjectInitializer& ObjectInitializer)
     :Super(ObjectInitializer)
@@ -15,9 +14,6 @@ ASDTBaseAIController::ASDTBaseAIController(const FObjectInitializer& ObjectIniti
 void ASDTBaseAIController::Tick(float deltaTime)
 {
     Super::Tick(deltaTime);
-
-    AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
-    m_AiAgentGroupManager->DrawSphereOverGroupMembers(deltaTime);
 
     /*UpdatePlayerInteraction(deltaTime);
 

@@ -24,7 +24,7 @@ void AiUpdateTimeSlicer::Destroy()
     m_Instance = nullptr;
 }
 
-void AiUpdateTimeSlicer::Consume(int amount)
+void AiUpdateTimeSlicer::Consume(float amount)
 {
     m_Balance -= amount;
 }
@@ -37,20 +37,34 @@ int AiUpdateTimeSlicer::GetBalance()
 void AiUpdateTimeSlicer::Reset()
 {
     m_Balance = m_Budget;
-    m_Counter = 0;
+    m_ExecutedAIs = 0;
 }
 
-int AiUpdateTimeSlicer::GetThreshold()
+int AiUpdateTimeSlicer::GetAICount()
 {
-    return m_Threshold;
+    return m_AICount;
 }
 
-void AiUpdateTimeSlicer::Increment()
+void AiUpdateTimeSlicer::IncrementAICount()
 {
-    m_Counter++;
+    m_AICount++;
 }
 
-int AiUpdateTimeSlicer::GetCounter()
+void AiUpdateTimeSlicer::IncrementExecutedAIs()
 {
-    return m_Counter;
+    m_ExecutedAIs++;
+}
+
+int AiUpdateTimeSlicer::GetExecutedAIs()
+{
+    return m_ExecutedAIs;
+}
+
+bool AiUpdateTimeSlicer::CanExecute() 
+{
+    if (GetExecutedAIs() == GetAICount()) 
+        Reset();
+
+    IncrementExecutedAIs();
+    return GetBalance() > 0;
 }
