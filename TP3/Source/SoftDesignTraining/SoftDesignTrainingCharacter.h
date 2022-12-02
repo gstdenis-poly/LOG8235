@@ -19,7 +19,7 @@ public:
 protected:
     UFUNCTION()
     virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
     FVector m_StartingPosition;
 };
 

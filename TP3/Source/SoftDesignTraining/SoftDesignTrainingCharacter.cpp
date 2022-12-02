@@ -8,6 +8,8 @@
 #include "SDTUtils.h"
 #include "DrawDebugHelpers.h"
 #include "SDTCollectible.h"
+#include "AiAgentGroupManager.h"
+#include "AiUpdateTimeSlicer.h"
 
 
 ASoftDesignTrainingCharacter::ASoftDesignTrainingCharacter()
@@ -52,5 +54,22 @@ void ASoftDesignTrainingCharacter::Die()
     if (ASDTAIController* controller = Cast<ASDTAIController>(GetController()))
     {
         controller->AIStateInterrupted();
+    }
+}
+
+void ASoftDesignTrainingCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+
+    AiAgentGroupManager* aiAgentGroupManager = AiAgentGroupManager::GetInstance();
+    if (aiAgentGroupManager)
+    {
+        aiAgentGroupManager->Destroy();
+    }
+
+    AiUpdateTimeSlicer* aiUpdateTimeSlicer = AiUpdateTimeSlicer::GetInstance();
+    if (aiUpdateTimeSlicer)
+    {
+        aiUpdateTimeSlicer->Destroy();
     }
 }

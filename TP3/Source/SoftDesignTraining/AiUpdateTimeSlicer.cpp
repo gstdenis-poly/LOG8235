@@ -45,9 +45,10 @@ int AiUpdateTimeSlicer::GetAICount()
     return m_AICount;
 }
 
-void AiUpdateTimeSlicer::IncrementAICount()
+void AiUpdateTimeSlicer::IncrementAICount(FString aiLabel)
 {
     m_AICount++;
+    m_nonExecutedControllers.AddUnique(aiLabel);
 }
 
 void AiUpdateTimeSlicer::IncrementExecutedAIs()
@@ -60,11 +61,25 @@ int AiUpdateTimeSlicer::GetExecutedAIs()
     return m_ExecutedAIs;
 }
 
-bool AiUpdateTimeSlicer::CanExecute() 
+bool AiUpdateTimeSlicer::CanExecute(FString aiLabel)
 {
     if (GetExecutedAIs() == GetAICount()) 
         Reset();
 
     IncrementExecutedAIs();
-    return GetBalance() > 0;
+
+    if (m_nonExecutedControllers.Num() == 0) 
+    {
+        m_nonExecutedControllers = m_executedControllers;
+        m_executedControllers.Empty();
+    }
+
+    if (GetBalance() > 0 && m_nonExecutedControllers.Contains(aiLabel)) 
+    {
+        m_nonExecutedControllers.Remove(aiLabel);
+        m_executedControllers.AddUnique(aiLabel);
+        return true;
+    }
+
+    return false;
 }

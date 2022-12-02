@@ -13,8 +13,8 @@ public:
     int GetAICount();
     void IncrementExecutedAIs();
     int GetExecutedAIs();
-    void IncrementAICount();
-    bool CanExecute();
+    void IncrementAICount(FString aiLabel);
+    bool CanExecute(FString aiLabel);
 
 private:
     AiUpdateTimeSlicer();
@@ -24,4 +24,8 @@ private:
     float m_Balance = m_Budget; // Available budget left for updates for the current frame
     int m_AICount = 0; // Number of AI controllers
     int m_ExecutedAIs = 0; //number of AI executed during the current frame (Incremented for every AIController Tick)
+
+    // Used to guarantee that every AI is updated once before some AIs are updated multiple times
+    TArray<FString> m_executedControllers; // All controllers executed once recently
+    TArray<FString> m_nonExecutedControllers; // All controllers in need to be updated soon
 };
