@@ -2,7 +2,7 @@
 
 #include "SoftDesignTrainingMainCharacter.h"
 #include "SoftDesignTraining.h"
-
+#include "AiAgentGroupManager.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -30,8 +30,11 @@ void ASoftDesignTrainingMainCharacter::OnBeginOverlap(UPrimitiveComponent* Overl
 
     if (ASoftDesignTrainingCharacter* character = Cast<ASoftDesignTrainingCharacter>(OtherActor))
     {
-        if (!IsPoweredUp())
+        if (!IsPoweredUp()) {
+            AiAgentGroupManager* aiAgentGroupManager = AiAgentGroupManager::GetInstance();
+            aiAgentGroupManager->EmptyChaseGroup(); // Vide le groupe de chasse si le joueur meurt
             SetActorLocation(m_StartingPosition);
+        }
     }
 }
 

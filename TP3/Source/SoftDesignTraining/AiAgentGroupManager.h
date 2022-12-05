@@ -11,12 +11,15 @@ public:
     static AiAgentGroupManager* GetInstance();
     static void Destroy();
 
+    bool AIAgentIsInChasingGroup(ASDTAIController* aiAgent);
     void RegisterAIAgent(ASDTAIController* aiAgent);
     void UnregisterAIAgent(ASDTAIController* aiAgent);
+    void EmptyChaseGroup();
     void DrawSphereOverGroupMembers();
     void GetChasingPointsAroundTarget();
     void AssignChasingPointsToAIs();
     void SetLastKnownPosition(FVector lkp) { m_lastKnownPosition = lkp; }
+    FVector GetLastKnownPosition() { return m_lastKnownPosition; }
 
 private:
 

@@ -26,6 +26,12 @@ void AiAgentGroupManager::Destroy()
 } 
 
 //Méthode pour ajouter un agent au groupe de poursuite
+bool AiAgentGroupManager::AIAgentIsInChasingGroup(ASDTAIController* aiAgent)
+{
+    return m_registeredAgents.Contains(aiAgent);
+}
+
+//Méthode pour ajouter un agent au groupe de poursuite
 void AiAgentGroupManager::RegisterAIAgent(ASDTAIController* aiAgent)
 {
     if (m_registeredAgents.AddUnique(aiAgent) != -1) {
@@ -41,6 +47,12 @@ void AiAgentGroupManager::UnregisterAIAgent(ASDTAIController* aiAgent)
         DrawSphereOverGroupMembers();
         GetChasingPointsAroundTarget();
     }
+}
+
+//Méthode pour enlever tous les agents au groupe de poursuite
+void AiAgentGroupManager::EmptyChaseGroup()
+{
+    m_registeredAgents.Empty();
 }
 
 //Méthode pour afficher un indicateur sur les agents membres du groupe

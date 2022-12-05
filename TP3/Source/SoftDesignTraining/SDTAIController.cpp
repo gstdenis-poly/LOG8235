@@ -88,6 +88,7 @@ void ASDTAIController::MoveToRandomCollectible()
 
         if (!collectibleActor->IsOnCooldown())
         {
+            //Profiling temps CPU
             double deltaTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles()) - startTime;
             DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Collect: " + FString::SanitizeFloat(deltaTime) + " ms", GetPawn(), FColor::Blue, .5f, false);
 
@@ -176,7 +177,9 @@ void ASDTAIController::MoveToBestFleeLocation()
     AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
     if (!timeSlicer->CanExecute(GetPawn()->GetActorLabel())) return;
 
+    //Profiling temps CPU
     double startTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles());
+
     AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
     m_AiAgentGroupManager->UnregisterAIAgent(this);
 
@@ -215,6 +218,7 @@ void ASDTAIController::MoveToBestFleeLocation()
 
     if (bestFleeLocation)
     {
+        //Profiling temps CPU
         double deltaTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles()) - startTime;
         DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Flee: " + FString::SanitizeFloat(deltaTime) + " ms", GetPawn(), FColor::Red, .5f, false);
 
@@ -415,6 +419,7 @@ bool ASDTAIController::TryDetectPlayer()
     AiUpdateTimeSlicer* timeSlicer = AiUpdateTimeSlicer::GetInstance();
     if (!timeSlicer->CanExecute(GetPawn()->GetActorLabel())) return false;
 
+    //Profiling temps CPU
     double startTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles());
 
     if (AtJumpSegment)
@@ -440,16 +445,23 @@ bool ASDTAIController::TryDetectPlayer()
     FHitResult detectionHit;
     GetHightestPriorityDetectionHit(allDetectionHits, detectionHit);
 
+    //Profiling temps CPU
     double deltaTime = FPlatformTime::ToMilliseconds(FPlatformTime::Cycles()) - startTime;
     DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), "Detect: " + FString::SanitizeFloat(deltaTime) + " ms", GetPawn(), FColor::Yellow, .5f, false);
 
     timeSlicer->Consume(deltaTime);
 
+    AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
+
     if (detectionHit.GetComponent() && detectionHit.GetComponent()->GetCollisionObjectType() == COLLISION_PLAYER) {
-        AiAgentGroupManager* m_AiAgentGroupManager = AiAgentGroupManager::GetInstance();
         m_AiAgentGroupManager->SetLastKnownPosition(detectionHit.GetActor()->GetActorLocation());
         m_AiAgentGroupManager->RegisterAIAgent(this);
         return true;
+    }
+    else if (m_AiAgentGroupManager->AIAgentIsInChasingGroup(this)) {
+        //Si le AI ne voit pas le joueur, mais fait partie du groupe de poursuite
+        //On vérifie si il a atteint la LKP du joueur
+        return (GetPawn()->GetActorLocation() - m_AiAgentGroupManager->GetLastKnownPosition()).Size() >= 30.f;
     }
     else return false;
 }

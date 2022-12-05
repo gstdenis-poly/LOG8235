@@ -51,9 +51,12 @@ void ASoftDesignTrainingCharacter::Die()
 {
     SetActorLocation(m_StartingPosition);
 
+    AiAgentGroupManager* aiAgentGroupManager = AiAgentGroupManager::GetInstance();
+
     if (ASDTAIController* controller = Cast<ASDTAIController>(GetController()))
     {
         controller->AIStateInterrupted();
+        if (aiAgentGroupManager) aiAgentGroupManager->UnregisterAIAgent(controller);
     }
 }
 
